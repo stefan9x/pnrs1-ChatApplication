@@ -1,13 +1,15 @@
 package stefan.jovanovic.chatapplication;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements View.OnClickListener {
 
     private EditText etUsername;
     private EditText etPassword;
@@ -47,7 +49,17 @@ public class MainActivity extends Activity {
         }
         etUsername.addTextChangedListener(etTextwatcher);
         etPassword.addTextChangedListener(etTextwatcher);
+
+        Button btnRegister = findViewById(R.id.register);
+        btnRegister.setOnClickListener(this);
     }
 
 
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.register){
+            Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
+            startActivity(intent);
+        }
+    }
 }
