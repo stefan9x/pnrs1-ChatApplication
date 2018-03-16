@@ -33,6 +33,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 btnLogin.setEnabled(true);
             } else {
                 btnLogin.setEnabled(false);
+                etPassword.setError("Minimum 6 characters");
             }
         }
     };
