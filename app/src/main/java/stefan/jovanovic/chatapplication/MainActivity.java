@@ -14,6 +14,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private EditText etUsername;
     private EditText etPassword;
     private Button btnLogin;
+    private Button btnRegister;
 
     public TextWatcher etTextwatcher = new TextWatcher() {
 
@@ -51,16 +52,21 @@ public class MainActivity extends Activity implements View.OnClickListener {
         etUsername.addTextChangedListener(etTextwatcher);
         etPassword.addTextChangedListener(etTextwatcher);
 
-        Button btnRegister = findViewById(R.id.register);
+        btnRegister = findViewById(R.id.register);
         btnRegister.setOnClickListener(this);
+        btnLogin.setOnClickListener(this);
     }
 
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.register){
-            Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
-            startActivity(intent);
+        if (view.getId() == R.id.register) {
+            Intent intRegisteractivity = new Intent(MainActivity.this, RegisterActivity.class);
+            startActivity(intRegisteractivity);
+        }
+        if (view.getId() == R.id.login){
+            Intent intContactsactivity = new Intent(MainActivity.this, ContactsActivity.class);
+            startActivity(intContactsactivity);
         }
     }
 }

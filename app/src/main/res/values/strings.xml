@@ -10,4 +10,8 @@
     <string name="gender">Gender</string>
     <string name="accept_notification">Accept Notification</string>
     <string name="birth_date">Birth Date</string>
+    <string name="logout">Log out</string>
+    <string name="contact1">My Friend</string>
+    <string name="send">Send</string>
+    <string name="type_message">Type a message</string>
 </resources>

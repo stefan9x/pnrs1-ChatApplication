@@ -9,19 +9,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.Toast;
-
-import java.security.AccessController;
 import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 public class RegisterActivity extends Activity implements View.OnClickListener{
 
     private EditText etUsername;
     private EditText etPassword;
-    private EditText etName;
-    private EditText etLastname;
+    //private EditText etName;
+    //private EditText etLastname;
     private EditText etEmail;
     private Button btnRegister;
     private DatePicker dpDatepicker;
@@ -89,11 +85,16 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
         etPassword.addTextChangedListener(etTextwatcher);
         etEmail.addTextChangedListener(etTextwatcher);
 
+        btnRegister.setOnClickListener(this);
+
     }
 
     @Override
     public void onClick(View view) {
-
+        if (view.getId() == R.id.new_register){
+            Intent intContactsactivity = new Intent (RegisterActivity.this, ContactsActivity.class);
+            startActivity(intContactsactivity);
+        }
     }
 
 }
