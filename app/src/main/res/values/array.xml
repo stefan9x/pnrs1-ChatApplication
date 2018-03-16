@@ -1,0 +1,6 @@
+<resources>
+    <string-array name="genderItems">
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
+</resources>
