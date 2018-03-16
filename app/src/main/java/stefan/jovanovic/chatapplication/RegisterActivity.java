@@ -39,11 +39,9 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
 
             String sUsername = etUsername.getText().toString();
             String sPassword = etPassword.getText().toString();
-            String sName = etName.getText().toString();
-            String sLastname = etLastname.getText().toString();
             String sEmail = etEmail.getText().toString();
 
-            boolean bUsername, bPassword, bName, bLastname, bEmail;
+            boolean bUsername, bPassword, bEmail;
 
             if(android.util.Patterns.EMAIL_ADDRESS.matcher(sEmail).matches()){
                 bEmail = true;
@@ -65,19 +63,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
                 bPassword = false;
             }
 
-            if (sName.length()>0){
-                bName = true;
-            }else{
-                bName = false;
-            }
-
-            if (sLastname.length()>0){
-                bLastname = true;
-            }else{
-                bLastname = false;
-            }
-
-            if (bEmail && bUsername && bPassword && bName && bLastname) {
+            if (bEmail && bUsername && bPassword) {
                 btnRegister.setEnabled(true);
             } else {
                 btnRegister.setEnabled(false);
@@ -94,8 +80,6 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
         dpDatepicker.setMaxDate(new Date().getTime());
         etPassword = findViewById(R.id.new_password);
         etUsername = findViewById(R.id.new_username);
-        etName = findViewById(R.id.name);
-        etLastname = findViewById(R.id.lastname);
         etEmail = findViewById(R.id.email);
         btnRegister = findViewById(R.id.new_register);
         if (etUsername.length() == 0){
@@ -103,8 +87,6 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
         }
         etUsername.addTextChangedListener(etTextwatcher);
         etPassword.addTextChangedListener(etTextwatcher);
-        etName.addTextChangedListener(etTextwatcher);
-        etLastname.addTextChangedListener(etTextwatcher);
         etEmail.addTextChangedListener(etTextwatcher);
 
     }
