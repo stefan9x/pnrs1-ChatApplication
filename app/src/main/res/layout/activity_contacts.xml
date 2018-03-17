@@ -10,7 +10,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
+        android:layout_gravity="end"
         android:text="@string/logout"
         android:id="@+id/logout"/>
 
@@ -31,6 +31,7 @@
             android:layout_gravity="center_vertical"
             android:text="@string/contact1"
             android:textSize="30sp"
+            android:textStyle="italic|bold"
             android:id="@+id/contact1"/></LinearLayout>
 
 </LinearLayout>

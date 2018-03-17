@@ -14,4 +14,6 @@
     <string name="contact1">My Friend</string>
     <string name="send">Send</string>
     <string name="type_message">Type a message</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
 </resources>

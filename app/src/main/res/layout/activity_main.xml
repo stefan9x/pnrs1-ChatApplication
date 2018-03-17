@@ -32,18 +32,20 @@
         android:layout_height="wrap_content"
         android:paddingTop="50dp"
         android:layout_gravity="center_horizontal">
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="@string/login"
-        android:id="@+id/login"/>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="@string/register"
-        android:id="@+id/register"/></LinearLayout>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/login"
+            android:id="@+id/login"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/register"
+            android:id="@+id/register"/>
+    </LinearLayout>
 
 </LinearLayout>
