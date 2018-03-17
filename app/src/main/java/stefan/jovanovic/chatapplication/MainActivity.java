@@ -8,6 +8,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
@@ -15,6 +16,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private EditText etPassword;
     private Button btnLogin;
     private Button btnRegister;
+    private int iBbcount;
 
     public TextWatcher etTextwatcher = new TextWatcher() {
 
@@ -67,6 +69,23 @@ public class MainActivity extends Activity implements View.OnClickListener {
         if (view.getId() == R.id.login){
             Intent intContactsactivity = new Intent(MainActivity.this, ContactsActivity.class);
             startActivity(intContactsactivity);
+        }
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        if(iBbcount >= 1)
+        {
+            Intent intExit = new Intent(Intent.ACTION_MAIN);
+            intExit.addCategory(Intent.CATEGORY_HOME);
+            intExit.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intExit);
+        }
+        else
+        {
+            Toast.makeText(this, "Press the back button once again to close the application.", Toast.LENGTH_SHORT).show();
+            iBbcount++;
         }
     }
 }

@@ -63,7 +63,7 @@ public class MessageActivity extends Activity implements View.OnClickListener{
         }
 
         if (view.getId() == R.id.send){
-            Toast.makeText(MessageActivity.this, "Message is sent!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Message is sent!", Toast.LENGTH_SHORT).show();
             etMessage.getText().clear();
         }
     }
