@@ -18,7 +18,7 @@
             android:layout_weight="1"
             android:hint="@string/username"
             android:textAlignment="center"
-            android:id="@+id/new_username"/>
+            android:id="@+id/et_new_username"/>
 
         <EditText
             android:layout_width="match_parent"
@@ -26,7 +26,7 @@
             android:layout_weight="1"
             android:hint="@string/name"
             android:textAlignment="center"
-            android:id="@+id/name"/></LinearLayout>
+            android:id="@+id/et_name"/></LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -40,7 +40,7 @@
             android:inputType="textPassword"
             android:hint="@string/password"
             android:textAlignment="center"
-            android:id="@+id/new_password"/>
+            android:id="@+id/et_new_password"/>
 
         <EditText
             android:layout_width="match_parent"
@@ -48,7 +48,7 @@
             android:layout_weight="1"
             android:hint="@string/last_name"
             android:textAlignment="center"
-            android:id="@+id/lastname"/></LinearLayout>
+            android:id="@+id/et_lastname"/></LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -58,23 +58,21 @@
         <EditText
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="4"
             android:hint="@string/email"
             android:inputType="textEmailAddress"
             android:textAlignment="center"
-            android:id="@+id/email"/>
+            android:id="@+id/et_email"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.3"
             android:text="@string/gender" />
 
         <Spinner
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.7"
-            android:id="@+id/gender"
+            android:layout_weight="1"
             android:entries="@array/genderItems"/></LinearLayout>
 
     <CheckBox
@@ -90,7 +88,7 @@
         android:text="@string/birth_date"/>
 
     <DatePicker
-        android:id="@+id/datePicker"
+        android:id="@+id/dp_datePicker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="20dp"
@@ -103,6 +101,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="@string/register"
-        android:id="@+id/new_register"/>
+        android:id="@+id/btn_new_register"/>
 
 </LinearLayout>

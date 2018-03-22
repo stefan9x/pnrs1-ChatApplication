@@ -16,4 +16,8 @@
     <string name="type_message">Type a message</string>
     <string name="male">Male</string>
     <string name="female">Female</string>
+    <string name="error_password_minimum">Minimum 6 characters</string>
+    <string name="main_activity_backbtn_toast">Press the back button again to close the application.</string>
+    <string name="error_email">Invalid email</string>
+    <string name="message_sent">"Message is sent!"</string>
 </resources>

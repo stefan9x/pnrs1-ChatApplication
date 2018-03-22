@@ -16,9 +16,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private EditText etPassword;
     private Button btnLogin;
     private Button btnRegister;
-    private int iBbcount;
+    private int backbtn_counter;
 
-    public TextWatcher etTextwatcher = new TextWatcher() {
+    public TextWatcher twLogin = new TextWatcher() {
 
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
@@ -32,11 +32,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
             String sUsername = etUsername.getText().toString();
             String sPassword = etPassword.getText().toString();
 
+            // check if username and password fields are filled correctly
+            //  to enable Login button
             if (sUsername.length() > 0 && sPassword.length() > 5) {
                 btnLogin.setEnabled(true);
-            } else {
+            }
+            else {
                 btnLogin.setEnabled(false);
-                etPassword.setError("Minimum 6 characters");
+                etPassword.setError(getText(R.string.error_email));
             }
         }
     };
@@ -45,47 +48,51 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        etPassword = findViewById(R.id.password);
-        etUsername = findViewById(R.id.username);
-        btnLogin = findViewById(R.id.login);
-        if (etUsername.length() == 0 && etPassword.length() == 0){
-            btnLogin.setEnabled(false);
-        }
-        etUsername.addTextChangedListener(etTextwatcher);
-        etPassword.addTextChangedListener(etTextwatcher);
 
-        btnRegister = findViewById(R.id.register);
+        etPassword = findViewById(R.id.et_password);
+        etUsername = findViewById(R.id.et_username);
+        btnLogin = findViewById(R.id.btn_login);
+        btnRegister = findViewById(R.id.btn_register);
+
+        // Adds text watchers on username and password fields
+        etUsername.addTextChangedListener(twLogin);
+        etPassword.addTextChangedListener(twLogin);
+
+        // Adds login and register buttons listeners
         btnRegister.setOnClickListener(this);
         btnLogin.setOnClickListener(this);
-    }
 
+        // Disables login button on activity create
+        btnLogin.setEnabled(false);
+    }
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.register) {
-            Intent intRegisteractivity = new Intent(MainActivity.this, RegisterActivity.class);
-            startActivity(intRegisteractivity);
+        //Starting register activity with register button
+        if (view.getId() == R.id.btn_register) {
+            Intent RegisterActivity_intent = new Intent(MainActivity.this, RegisterActivity.class);
+            startActivity(RegisterActivity_intent);
         }
-        if (view.getId() == R.id.login){
-            Intent intContactsactivity = new Intent(MainActivity.this, ContactsActivity.class);
-            startActivity(intContactsactivity);
+        //Starting contacts activity with login button
+        if (view.getId() == R.id.btn_login){
+            Intent ContactsActivity_intent = new Intent(MainActivity.this, ContactsActivity.class);
+            startActivity(ContactsActivity_intent);
         }
     }
 
     @Override
     public void onBackPressed()
     {
-        if(iBbcount >= 1)
-        {
-            Intent intExit = new Intent(Intent.ACTION_MAIN);
-            intExit.addCategory(Intent.CATEGORY_HOME);
-            intExit.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intExit);
+        //Display toast message if user try to leave main activity with back button
+        if(backbtn_counter >= 1) {
+            Intent Exit_intent = new Intent(Intent.ACTION_MAIN);
+            Exit_intent.addCategory(Intent.CATEGORY_HOME);
+            Exit_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(Exit_intent);
         }
-        else
-        {
-            Toast.makeText(this, "Press the back button once again to close the application.", Toast.LENGTH_SHORT).show();
-            iBbcount++;
+        else {
+            Toast.makeText(this, getText(R.string.main_activity_backbtn_toast), Toast.LENGTH_SHORT).show();
+            backbtn_counter++;
         }
     }
 }

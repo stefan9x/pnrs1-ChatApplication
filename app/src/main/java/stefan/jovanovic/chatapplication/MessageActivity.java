@@ -16,7 +16,7 @@ public class MessageActivity extends Activity implements View.OnClickListener{
     private Button btnSend;
     private EditText etMessage;
 
-    public TextWatcher etTextwatcher = new TextWatcher() {
+    public TextWatcher twSend = new TextWatcher() {
 
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
@@ -29,9 +29,11 @@ public class MessageActivity extends Activity implements View.OnClickListener{
 
             String sMessage = etMessage.getText().toString();
 
+            // Disables send button if message is not entered
             if (sMessage.length() == 0) {
                 btnSend.setEnabled(false);
-            } else {
+            }
+            else{
                 btnSend.setEnabled(true);
             }
         }
@@ -42,28 +44,32 @@ public class MessageActivity extends Activity implements View.OnClickListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
 
-        btnLogout = findViewById(R.id.logout_message);
-        btnSend = findViewById(R.id.send);
-        etMessage = findViewById(R.id.message);
+        btnLogout = findViewById(R.id.btn_logout_message);
+        btnSend = findViewById(R.id.btn_send);
+        etMessage = findViewById(R.id.et_message);
 
-        if (etMessage.length() == 0){
-            btnSend.setEnabled(false);
-        }
+        // Disables send button on message activity create
+        btnSend.setEnabled(false);
 
-        etMessage.addTextChangedListener(etTextwatcher);
+        // Adds text watcher to message field
+        etMessage.addTextChangedListener(twSend);
+
+        // Adds listeners on logout and send buttons
         btnLogout.setOnClickListener(this);
         btnSend.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.logout_message){
+        // Starts main activity if logout button is pressed
+        if (view.getId() == R.id.btn_logout_message){
             Intent intMainactivity = new Intent (MessageActivity.this, MainActivity.class);
             startActivity(intMainactivity);
         }
 
-        if (view.getId() == R.id.send){
-            Toast.makeText(this, "Message is sent!", Toast.LENGTH_SHORT).show();
+        // Shows toast message if send button is pressed and clears message field
+        if (view.getId() == R.id.btn_send){
+            Toast.makeText(this, getText(R.string.message_sent), Toast.LENGTH_SHORT).show();
             etMessage.getText().clear();
         }
     }

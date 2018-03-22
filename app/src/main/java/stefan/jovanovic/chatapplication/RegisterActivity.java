@@ -16,13 +16,13 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
 
     private EditText etUsername;
     private EditText etPassword;
-    //private EditText etName;
-    //private EditText etLastname;
+    //private EditText etName; // for later use
+    //private EditText etLastname; // for later use
     private EditText etEmail;
     private Button btnRegister;
     private DatePicker dpDatepicker;
 
-    public TextWatcher etTextwatcher = new TextWatcher() {
+    public TextWatcher twRegister = new TextWatcher() {
 
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
@@ -39,29 +39,39 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
 
             boolean bUsername, bPassword, bEmail;
 
+            // Checks if users entered email in correct format
             if(android.util.Patterns.EMAIL_ADDRESS.matcher(sEmail).matches()){
                 bEmail = true;
-            }else{
-                etEmail.setError("invalid email");
+            }
+            else{
+                // Display error if email is incorrectly typed
+                etEmail.setError(getText(R.string.error_email));
                 bEmail = false;
             }
 
+            // Checks if username is entered
             if (sUsername.length()>0){
                 bUsername = true;
-            }else{
+            }
+            else{
                 bUsername = false;
             }
 
+            // Checks if password with minimum of 6 characters is entered
             if (sPassword.length()>5){
                 bPassword = true;
-            }else{
-                etPassword.setError("Minimum 6 characters");
+            }
+            else{
+                // Display error if password is too short
+                etPassword.setError(getText(R.string.error_password_minimum));
                 bPassword = false;
             }
 
+            // Enables register button if required fields are filled
             if (bEmail && bUsername && bPassword) {
                 btnRegister.setEnabled(true);
-            } else {
+            }
+            else{
                 btnRegister.setEnabled(false);
             }
         }
@@ -72,28 +82,33 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        dpDatepicker = findViewById(R.id.datePicker);
+        etUsername = findViewById(R.id.et_new_username);
+        etPassword = findViewById(R.id.et_new_password);
+        etEmail = findViewById(R.id.et_email);
+        btnRegister = findViewById(R.id.btn_new_register);
+        dpDatepicker = findViewById(R.id.dp_datePicker);
+
+        // Sets max date for date picker
         dpDatepicker.setMaxDate(new Date().getTime());
-        etPassword = findViewById(R.id.new_password);
-        etUsername = findViewById(R.id.new_username);
-        etEmail = findViewById(R.id.email);
-        btnRegister = findViewById(R.id.new_register);
-        if (etUsername.length() == 0){
-            btnRegister.setEnabled(false);
-        }
-        etUsername.addTextChangedListener(etTextwatcher);
-        etPassword.addTextChangedListener(etTextwatcher);
-        etEmail.addTextChangedListener(etTextwatcher);
 
+        // Disables register button on register activity create
+        btnRegister.setEnabled(false);
+
+        // Adds text watchers on username, password and email fields
+        etUsername.addTextChangedListener(twRegister);
+        etPassword.addTextChangedListener(twRegister);
+        etEmail.addTextChangedListener(twRegister);
+
+        // Adds register button listeners
         btnRegister.setOnClickListener(this);
-
     }
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.new_register){
-            Intent intContactsactivity = new Intent (RegisterActivity.this, ContactsActivity.class);
-            startActivity(intContactsactivity);
+        // Starts contacts activity if register button is pressed
+        if (view.getId() == R.id.btn_new_register){
+            Intent ContactsActivity_intent = new Intent (RegisterActivity.this, ContactsActivity.class);
+            startActivity(ContactsActivity_intent);
         }
     }
 

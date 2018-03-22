@@ -17,23 +17,26 @@ public class ContactsActivity extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
 
-        tvContact1 = findViewById(R.id.contact1);
-        btnLogout = findViewById(R.id.logout);
+        tvContact1 = findViewById(R.id.tv_contact1);
+        btnLogout = findViewById(R.id.btn_logout);
+
+        // Adds contacts and logout button listeners
         tvContact1.setOnClickListener(this);
         btnLogout.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.logout){
+        // Starts main activity if logout button is pressed
+        if (view.getId() == R.id.btn_logout){
             Intent intMainactivity = new Intent(ContactsActivity.this, MainActivity.class);
             startActivity(intMainactivity);
         }
 
-        if (view.getId() == R.id.contact1){
+        // Starts message activity if contact textview is pressed
+        if (view.getId() == R.id.tv_contact1){
             Intent intMessageActivity = new Intent(ContactsActivity.this, MessageActivity.class);
             startActivity(intMessageActivity);
         }
-
     }
 }
