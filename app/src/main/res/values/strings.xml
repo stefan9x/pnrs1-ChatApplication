@@ -20,4 +20,5 @@
     <string name="main_activity_backbtn_toast">Press the back button again to close the application.</string>
     <string name="error_email">Invalid email</string>
     <string name="message_sent">"Message is sent!"</string>
+    <string name="error_username">Type username</string>
 </resources>

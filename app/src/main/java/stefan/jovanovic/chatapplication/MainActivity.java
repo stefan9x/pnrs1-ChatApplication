@@ -32,14 +32,28 @@ public class MainActivity extends Activity implements View.OnClickListener {
             String sUsername = etUsername.getText().toString();
             String sPassword = etPassword.getText().toString();
 
+            boolean bUsername, bPassword;
+
             // check if username and password fields are filled correctly
             //  to enable Login button
-            if (sUsername.length() > 0 && sPassword.length() > 5) {
-                btnLogin.setEnabled(true);
+            if (sUsername.length() > 0)  {
+                bUsername = true;
+            } else {
+                bUsername = false;
+                etUsername.setError(getText(R.string.error_username));
             }
-            else {
+
+            if (sPassword.length() > 5) {
+                bPassword = true;
+            } else {
+                bPassword = false;
+                etPassword.setError(getText(R.string.error_password_minimum));
+            }
+
+            if (bUsername && bPassword){
+                btnLogin.setEnabled(true);
+            } else {
                 btnLogin.setEnabled(false);
-                etPassword.setError(getText(R.string.error_email));
             }
         }
     };

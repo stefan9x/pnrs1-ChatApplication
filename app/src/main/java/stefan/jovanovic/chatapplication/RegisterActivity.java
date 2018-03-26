@@ -42,8 +42,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
             // Checks if users entered email in correct format
             if(android.util.Patterns.EMAIL_ADDRESS.matcher(sEmail).matches()){
                 bEmail = true;
-            }
-            else{
+            } else{
                 // Display error if email is incorrectly typed
                 etEmail.setError(getText(R.string.error_email));
                 bEmail = false;
@@ -52,16 +51,15 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
             // Checks if username is entered
             if (sUsername.length()>0){
                 bUsername = true;
-            }
-            else{
+            } else{
                 bUsername = false;
+                etUsername.setError(getText(R.string.error_username));
             }
 
             // Checks if password with minimum of 6 characters is entered
             if (sPassword.length()>5){
                 bPassword = true;
-            }
-            else{
+            } else{
                 // Display error if password is too short
                 etPassword.setError(getText(R.string.error_password_minimum));
                 bPassword = false;
@@ -70,8 +68,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
             // Enables register button if required fields are filled
             if (bEmail && bUsername && bPassword) {
                 btnRegister.setEnabled(true);
-            }
-            else{
+            } else{
                 btnRegister.setEnabled(false);
             }
         }
