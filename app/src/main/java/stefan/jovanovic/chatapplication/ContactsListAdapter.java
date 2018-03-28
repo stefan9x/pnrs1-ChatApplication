@@ -10,7 +10,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -19,7 +18,7 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
     private Context cContext;
     private ArrayList<ContactClass> arlstContacts;
 
-    private String[] contacts_list = new String[5];
+    private String[] contacts_list = new String[10];
     private String clickecContact;
 
 

@@ -26,6 +26,8 @@ public class ContactsActivity extends Activity implements View.OnClickListener {
         ContactsListAdapter contactslistadapter = new ContactsListAdapter(this);
         contactslistadapter.addContactClass(new ContactClass((String) getText(R.string.contact1)));
         contactslistadapter.addContactClass(new ContactClass((String) getText(R.string.contact2)));
+        contactslistadapter.addContactClass(new ContactClass((String) getText(R.string.contact3)));
+        contactslistadapter.addContactClass(new ContactClass((String) getText(R.string.contact4)));
 
         lvContacts.setAdapter(contactslistadapter);
     }
