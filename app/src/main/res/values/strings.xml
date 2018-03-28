@@ -20,6 +20,7 @@
     <string name="error_email">Invalid email</string>
     <string name="message_sent">"Message is sent!"</string>
     <string name="error_username">Type username</string>
+    <string name="my_chat_list">My Chat List</string>
     <string name="contact1">Jelena Sekulic</string>
     <string name="contact2">Aleksandar</string>
 

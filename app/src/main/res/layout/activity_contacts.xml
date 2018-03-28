@@ -7,12 +7,26 @@
     android:orientation="vertical"
     tools:context="stefan.jovanovic.chatapplication.ContactsActivity">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:text="@string/logout"
-        android:id="@+id/btn_logout"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:text="@string/my_chat_list"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="@string/logout"
+            android:id="@+id/btn_logout"/>
+    </RelativeLayout>
 
     <ListView
         android:layout_width="wrap_content"

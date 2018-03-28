@@ -1,6 +1,5 @@
 package stefan.jovanovic.chatapplication;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -8,9 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
+
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -19,6 +18,10 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
 
     private Context cContext;
     private ArrayList<ContactClass> arlstContacts;
+
+    private String[] contacts_list = new String[5];
+    private String clickecContact;
+
 
     public ContactsListAdapter(Context context){
         cContext = context;
@@ -61,9 +64,9 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
             ContactHolder holder = new ContactHolder();
             holder.tvFirstletter = (TextView) view.findViewById(R.id.tv_name_first_letter);
             holder.tvName = (TextView) view.findViewById(R.id.tv_contact_name);
-            holder.imgbtnSend = (ImageView) view.findViewById(R.id.imgbtn_send);
+            holder.imgbtnSend = (ImageButton) view.findViewById(R.id.imgbtn_send);
             holder.imgbtnSend.setOnClickListener(this);
-
+            holder.imgbtnSend.setTag(position);
             view.setTag(holder);
         }
 
@@ -76,18 +79,26 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
         holder.tvFirstletter.setText(contactclass.getTvName().substring(0,1).toUpperCase());
         holder.tvFirstletter.setBackgroundColor(color);
         holder.tvName.setText(contactclass.getTvName());
+        contacts_list[position] = contactclass.getTvName();
 
         return view;
     }
 
     @Override
     public void onClick(View view) {
-        Toast.makeText(cContext, "print", Toast.LENGTH_SHORT).show();
+        int position = Integer.parseInt(view.getTag().toString());
+        clickecContact = contacts_list[position];
+
+        if (view.getId() == R.id.imgbtn_send){
+            Intent intMessageactivity = new Intent(cContext.getApplicationContext(), MessageActivity.class);
+            intMessageactivity.putExtra("contact_name", clickecContact);
+            cContext.startActivity(intMessageactivity);
+        }
     }
 
     private class ContactHolder{
         public TextView tvFirstletter = null;
         public TextView tvName = null;
-        public ImageView imgbtnSend = null;
+        public ImageButton imgbtnSend = null;
     }
 }

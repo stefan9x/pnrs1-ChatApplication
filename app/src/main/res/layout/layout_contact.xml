@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants">
 
         <TextView
             android:id="@+id/tv_name_first_letter"
@@ -9,9 +10,7 @@
             android:layout_height="60dp"
             android:gravity="center"
             android:textSize="25sp"
-            android:layout_alignParentLeft="true"
-            android:focusable="false"
-            android:clickable="false"/>
+            android:layout_alignParentLeft="true" />
 
         <TextView
             android:layout_width="200dp"
@@ -19,16 +18,15 @@
             android:gravity="center"
             android:textSize="20sp"
             android:layout_toRightOf="@id/tv_name_first_letter"
-            android:id="@+id/tv_contact_name"
-            android:focusable="false"
-            android:clickable="false"/>
+            android:id="@+id/tv_contact_name" />
 
-        <ImageView
+        <ImageButton
             android:id="@+id/imgbtn_send"
             android:layout_alignParentRight="true"
             android:layout_toRightOf="@id/tv_contact_name"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:background="@null"
             android:src="@android:drawable/ic_menu_send"
             android:tint="@color/colorAccent" />
 </RelativeLayout>

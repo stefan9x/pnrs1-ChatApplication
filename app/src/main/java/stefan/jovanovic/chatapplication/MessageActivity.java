@@ -8,6 +8,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MessageActivity extends Activity implements View.OnClickListener{
@@ -15,6 +16,9 @@ public class MessageActivity extends Activity implements View.OnClickListener{
     private Button btnLogout;
     private Button btnSend;
     private EditText etMessage;
+    private TextView tvContactname;
+
+    String contact_name;
 
     public TextWatcher twSend = new TextWatcher() {
 
@@ -47,6 +51,17 @@ public class MessageActivity extends Activity implements View.OnClickListener{
         btnLogout = findViewById(R.id.btn_logout_message);
         btnSend = findViewById(R.id.btn_send);
         etMessage = findViewById(R.id.et_message);
+        tvContactname = findViewById(R.id.tv_message_contact_name);
+
+        Intent contacts_intent = getIntent();
+
+
+        Bundle extras = contacts_intent.getExtras();
+        String tmp = extras.getString("contact_name");
+
+        //contact_name = contacts_intent.getStringExtra("contact_name");
+
+        tvContactname.setText(tmp);
 
         // Disables send button on message activity create
         btnSend.setEnabled(false);
