@@ -11,7 +11,6 @@
     <string name="accept_notification">Accept Notification</string>
     <string name="birth_date">Birth Date</string>
     <string name="logout">Log out</string>
-    <string name="contact1">My Friend</string>
     <string name="send">Send</string>
     <string name="type_message">Type a message</string>
     <string name="male">Male</string>
@@ -21,4 +20,7 @@
     <string name="error_email">Invalid email</string>
     <string name="message_sent">"Message is sent!"</string>
     <string name="error_username">Type username</string>
+    <string name="contact1">Jelena Sekulic</string>
+    <string name="contact2">Aleksandar</string>
+
 </resources>
