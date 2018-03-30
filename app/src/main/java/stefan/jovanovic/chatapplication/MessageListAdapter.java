@@ -1,8 +1,6 @@
 package stefan.jovanovic.chatapplication;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -58,6 +56,7 @@ public class MessageListAdapter extends BaseAdapter{
 
             MessageListAdapter.MessageHolder holder = new MessageListAdapter.MessageHolder();
             holder.tvMessage = (TextView) view.findViewById(R.id.tv_message);
+
             view.setTag(holder);
         }
 
@@ -66,9 +65,14 @@ public class MessageListAdapter extends BaseAdapter{
 
 
         holder.tvMessage.setText(messageclass.getsMessage());
+        holder.sUser = messageclass.getsUser();
 
-        holder.tvMessage.setGravity(Gravity.RIGHT|Gravity.CENTER);
-        if (position % 2 == 1){
+        if (holder.sUser.contentEquals("User")){
+            holder.tvMessage.setGravity(Gravity.RIGHT|Gravity.CENTER);
+            holder.tvMessage.setTextColor(Color.rgb(255, 255,255));
+        }
+
+        if (holder.sUser.equals("Bot")){
             holder.tvMessage.setGravity(Gravity.LEFT|Gravity.CENTER);
             holder.tvMessage.setTextColor(Color.rgb(234, 117,0));
         }
@@ -78,6 +82,7 @@ public class MessageListAdapter extends BaseAdapter{
 
     private class MessageHolder{
         public TextView tvMessage = null;
+        public String sUser = null;
     }
 }
 

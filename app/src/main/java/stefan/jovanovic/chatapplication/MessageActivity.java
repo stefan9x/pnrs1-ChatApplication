@@ -20,8 +20,6 @@ public class MessageActivity extends Activity implements View.OnClickListener {
     private TextView tvContactname;
     private ListView lvMessages;
 
-    int pos = 0;
-
     private MessageListAdapter messagelistadapter = new MessageListAdapter(this);
 
     public TextWatcher twSend = new TextWatcher() {
@@ -85,31 +83,34 @@ public class MessageActivity extends Activity implements View.OnClickListener {
 
         // Shows toast message if send button is pressed and clears message field
         if (view.getId() == R.id.btn_send) {
+
+            messagelistadapter.addMessagesClass(new MessageClass(etMessage.getText().toString(), "User"));
+            chatBot(etMessage.getText().toString());
             Toast.makeText(this, getText(R.string.message_sent), Toast.LENGTH_SHORT).show();
-            messagelistadapter.addMessagesClass(new MessageClass(etMessage.getText().toString()));
             etMessage.getText().clear();
-            pos++;
-            chatBot();
 
         }
     }
 
-    public void chatBot() {
+    public void chatBot(String text) {
 
-        if (pos == 1) {
-            messagelistadapter.addMessagesClass(new MessageClass("Hey!"));
+        if (text.contains("hello")) {
+            messagelistadapter.addMessagesClass(new MessageClass("Hey!", "Bot"));
         }
-        if (pos == 2) {
-            messagelistadapter.addMessagesClass(new MessageClass("I'm fine thanks, whats up?"));
+        if (text.contains("how")) {
+            messagelistadapter.addMessagesClass(new MessageClass("I'm fine thanks, you?", "Bot"));
         }
-        if (pos == 3) {
-            messagelistadapter.addMessagesClass(new MessageClass("Nothing special, will i see you tonight?"));
+        if (text.contains("what")) {
+            messagelistadapter.addMessagesClass(new MessageClass("Nothing special.", "Bot"));
         }
-        if (pos == 4) {
-            messagelistadapter.addMessagesClass(new MessageClass("Fine, see you!"));
+        if (text.contains("yes")) {
+            messagelistadapter.addMessagesClass(new MessageClass("what yes?", "Bot"));
         }
-        if(pos == 5){
-            messagelistadapter.addMessagesClass(new MessageClass("Bye!"));
+        if(text.contains("no")){
+            messagelistadapter.addMessagesClass(new MessageClass("what no?", "Bot"));
+        }
+        if(text.contains("bye")){
+            messagelistadapter.addMessagesClass(new MessageClass("Bye!", "Bot"));
         }
     }
 }

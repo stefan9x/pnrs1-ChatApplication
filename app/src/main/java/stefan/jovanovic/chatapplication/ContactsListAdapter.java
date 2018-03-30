@@ -18,10 +18,6 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
     private Context cContext;
     private ArrayList<ContactClass> arlstContacts;
 
-    private String[] contacts_list = new String[10];
-    private String clickecContact;
-
-
     public ContactsListAdapter(Context context){
         cContext = context;
         arlstContacts = new ArrayList<ContactClass>();
@@ -65,7 +61,6 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
             holder.tvName = (TextView) view.findViewById(R.id.tv_contact_name);
             holder.imgbtnSend = (ImageButton) view.findViewById(R.id.imgbtn_send);
             holder.imgbtnSend.setOnClickListener(this);
-            holder.imgbtnSend.setTag(position);
             view.setTag(holder);
         }
 
@@ -78,19 +73,16 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
         holder.tvFirstletter.setText(contactclass.getTvName().substring(0,1).toUpperCase());
         holder.tvFirstletter.setBackgroundColor(color);
         holder.tvName.setText(contactclass.getTvName());
-        contacts_list[position] = contactclass.getTvName();
+        holder.imgbtnSend.setTag(contactclass.getTvName());
 
         return view;
     }
 
     @Override
     public void onClick(View view) {
-        int position = Integer.parseInt(view.getTag().toString());
-        clickecContact = contacts_list[position];
-
         if (view.getId() == R.id.imgbtn_send){
             Intent intMessageactivity = new Intent(cContext.getApplicationContext(), MessageActivity.class);
-            intMessageactivity.putExtra("contact_name", clickecContact);
+            intMessageactivity.putExtra("contact_name", view.getTag().toString());
             cContext.startActivity(intMessageactivity);
         }
     }
