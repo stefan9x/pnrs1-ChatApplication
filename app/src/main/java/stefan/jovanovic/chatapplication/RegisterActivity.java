@@ -108,5 +108,4 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
             startActivity(ContactsActivity_intent);
         }
     }
-
 }

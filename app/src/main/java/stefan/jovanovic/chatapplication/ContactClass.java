@@ -1,7 +1,5 @@
 package stefan.jovanovic.chatapplication;
 
-import android.graphics.drawable.Drawable;
-
 public class ContactClass {
     private String tvName;
 

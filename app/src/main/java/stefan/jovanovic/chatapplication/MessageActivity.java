@@ -1,18 +1,22 @@
 package stefan.jovanovic.chatapplication;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 
-public class MessageActivity extends Activity implements View.OnClickListener {
+public class MessageActivity extends Activity implements View.OnClickListener, AdapterView.OnItemLongClickListener{
 
     private Button btnLogout;
     private Button btnSend;
@@ -61,6 +65,7 @@ public class MessageActivity extends Activity implements View.OnClickListener {
         tvContactname.setText(contacts_intent.getStringExtra("contact_name"));
 
         lvMessages.setAdapter(messagelistadapter);
+        lvMessages.setOnItemLongClickListener(this);
 
         // Disables send button on message activity create
         btnSend.setEnabled(false);
@@ -83,12 +88,10 @@ public class MessageActivity extends Activity implements View.OnClickListener {
 
         // Shows toast message if send button is pressed and clears message field
         if (view.getId() == R.id.btn_send) {
-
             messagelistadapter.addMessagesClass(new MessageClass(etMessage.getText().toString(), "User"));
             chatBot(etMessage.getText().toString());
             Toast.makeText(this, getText(R.string.message_sent), Toast.LENGTH_SHORT).show();
             etMessage.getText().clear();
-
         }
     }
 
@@ -112,5 +115,36 @@ public class MessageActivity extends Activity implements View.OnClickListener {
         if(text.contains("bye")){
             messagelistadapter.addMessagesClass(new MessageClass("Bye!", "Bot"));
         }
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+        final int deletePos = position;
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Delete?");
+        alert.setMessage("Are you sure you want to delete message?");
+
+        alert.setPositiveButton("YES", new OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //do your work here
+                messagelistadapter.removeMessagesClass(deletePos);
+            }
+        });
+
+        alert.setNegativeButton("NO", new OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.dismiss();
+            }
+        });
+
+        alert.show();
+
+        return true;
     }
 }

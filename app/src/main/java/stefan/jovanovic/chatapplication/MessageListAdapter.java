@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class MessageListAdapter extends BaseAdapter{
+public class MessageListAdapter extends BaseAdapter {
 
     private Context cContext;
     private ArrayList<MessageClass> arlstMessages;
@@ -24,6 +24,13 @@ public class MessageListAdapter extends BaseAdapter{
     public void addMessagesClass(MessageClass message){
         arlstMessages.add(message);
         notifyDataSetChanged();
+    }
+
+    public void removeMessagesClass(int position){
+
+    arlstMessages.remove(position);
+    notifyDataSetChanged();
+
     }
 
     @Override
