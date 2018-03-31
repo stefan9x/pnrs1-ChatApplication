@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import java.util.ArrayList;
 
@@ -63,6 +65,7 @@ public class MessageListAdapter extends BaseAdapter {
 
             MessageListAdapter.MessageHolder holder = new MessageListAdapter.MessageHolder();
             holder.tvMessage = (TextView) view.findViewById(R.id.tv_message);
+            holder.tvTime = (TextView) view.findViewById(R.id.message_time);
 
             view.setTag(holder);
         }
@@ -74,14 +77,20 @@ public class MessageListAdapter extends BaseAdapter {
         holder.tvMessage.setText(messageclass.getsMessage());
         holder.sUser = messageclass.getsUser();
 
+        holder.tvTime.setText(new SimpleDateFormat("HH:mm").format(Calendar.getInstance().getTime()));
+
         if (holder.sUser.contentEquals("User")){
             holder.tvMessage.setGravity(Gravity.RIGHT|Gravity.CENTER);
             holder.tvMessage.setTextColor(Color.rgb(255, 255,255));
+            holder.tvTime.setGravity(Gravity.RIGHT);
+            holder.tvTime.setTextColor(Color.rgb(255, 255,255));
         }
 
         if (holder.sUser.equals("Bot")){
             holder.tvMessage.setGravity(Gravity.LEFT|Gravity.CENTER);
             holder.tvMessage.setTextColor(Color.rgb(234, 117,0));
+            holder.tvTime.setGravity(Gravity.LEFT);
+            holder.tvTime.setTextColor(Color.rgb(234, 117,0));
         }
 
         return view;
@@ -90,6 +99,7 @@ public class MessageListAdapter extends BaseAdapter {
     private class MessageHolder{
         public TextView tvMessage = null;
         public String sUser = null;
+        public TextView tvTime = null;
     }
 }
 
