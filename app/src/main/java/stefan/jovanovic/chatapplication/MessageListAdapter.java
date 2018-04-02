@@ -77,20 +77,26 @@ public class MessageListAdapter extends BaseAdapter {
         holder.tvMessage.setText(messageclass.getsMessage());
         holder.sUser = messageclass.getsUser();
 
+        // Setting time
         holder.tvTime.setText(new SimpleDateFormat("HH:mm").format(Calendar.getInstance().getTime()));
 
+        // Setting text and background colors and gravity based on user
         if (holder.sUser.contentEquals("User")){
             holder.tvMessage.setGravity(Gravity.RIGHT|Gravity.CENTER);
             holder.tvMessage.setTextColor(Color.rgb(255, 255,255));
+            holder.tvMessage.setBackgroundColor(Color.argb(50,173,173,173));
             holder.tvTime.setGravity(Gravity.RIGHT);
             holder.tvTime.setTextColor(Color.rgb(255, 255,255));
+            holder.tvTime.setBackgroundColor(Color.argb(50,173,173,173));
         }
 
         if (holder.sUser.equals("Bot")){
             holder.tvMessage.setGravity(Gravity.LEFT|Gravity.CENTER);
             holder.tvMessage.setTextColor(Color.rgb(234, 117,0));
+            holder.tvMessage.setBackgroundColor(Color.argb(0,255,255,255));
             holder.tvTime.setGravity(Gravity.LEFT);
             holder.tvTime.setTextColor(Color.rgb(234, 117,0));
+            holder.tvTime.setBackgroundColor(Color.argb(0,255,255,255));
         }
 
         return view;

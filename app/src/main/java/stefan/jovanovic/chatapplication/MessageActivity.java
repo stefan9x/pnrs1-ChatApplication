@@ -61,10 +61,14 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
         tvContactname = findViewById(R.id.tv_message_contact_name);
         lvMessages = findViewById(R.id.messages_list);
 
+        // Contact name in upper corner
         Intent contacts_intent = getIntent();
         tvContactname.setText(contacts_intent.getStringExtra("contact_name"));
 
+        // Setting adapter to list
         lvMessages.setAdapter(messagelistadapter);
+
+        // On item long click listener
         lvMessages.setOnItemLongClickListener(this);
 
         // Disables send button on message activity create
@@ -97,22 +101,23 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
 
     public void chatBot(String text) {
 
-        if (text.contains("hello")) {
+        // Simple chat bot
+        if (text.toLowerCase().contains("hello")) {
             messagelistadapter.addMessagesClass(new MessageClass("Hey!", "Bot"));
         }
-        if (text.contains("how")) {
+        else if (text.toLowerCase().contains("how")) {
             messagelistadapter.addMessagesClass(new MessageClass("I'm fine thanks, you?", "Bot"));
         }
-        if (text.contains("what")) {
+        else if (text.toLowerCase().contains("what")) {
             messagelistadapter.addMessagesClass(new MessageClass("Nothing special.", "Bot"));
         }
-        if (text.contains("yes")) {
+        else if (text.toLowerCase().contains("yes")) {
             messagelistadapter.addMessagesClass(new MessageClass("what yes?", "Bot"));
         }
-        if(text.contains("no")){
+        else if(text.toLowerCase().contains("no")){
             messagelistadapter.addMessagesClass(new MessageClass("what no?", "Bot"));
         }
-        if(text.contains("bye")){
+        else if(text.toLowerCase().contains("bye")){
             messagelistadapter.addMessagesClass(new MessageClass("Bye!", "Bot"));
         }
     }
@@ -121,6 +126,8 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
         final int deletePos = position;
+
+        // Delete confirmation dialog
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle("Delete?");
         alert.setMessage("Are you sure you want to delete message?");

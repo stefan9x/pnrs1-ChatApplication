@@ -67,12 +67,18 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
         ContactClass contactclass = (ContactClass) getItem(position);
         ContactHolder holder = (ContactHolder) view.getTag();
 
+        // Generating random background color
         Random rnd = new Random();
         int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
 
+        // Getting first letter from name
         holder.tvFirstletter.setText(contactclass.getTvName().substring(0,1).toUpperCase());
         holder.tvFirstletter.setBackgroundColor(color);
+
+        // Setting text to name
         holder.tvName.setText(contactclass.getTvName());
+
+        // Setting contact name on button tag
         holder.imgbtnSend.setTag(contactclass.getTvName());
 
         return view;

@@ -23,12 +23,14 @@ public class ContactsActivity extends Activity implements View.OnClickListener {
         // Adds logout button listener
         btnLogout.setOnClickListener(this);
 
+        // Adding contacts to list
         ContactsListAdapter contactslistadapter = new ContactsListAdapter(this);
         contactslistadapter.addContactClass(new ContactClass((String) getText(R.string.contact1)));
         contactslistadapter.addContactClass(new ContactClass((String) getText(R.string.contact2)));
         contactslistadapter.addContactClass(new ContactClass((String) getText(R.string.contact3)));
         contactslistadapter.addContactClass(new ContactClass((String) getText(R.string.contact4)));
 
+        // Setting adapter to contacts list
         lvContacts.setAdapter(contactslistadapter);
     }
 
