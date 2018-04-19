@@ -25,4 +25,6 @@
     <string name="contact2">Aleksandar</string>
     <string name="contact3">Djole</string>
     <string name="contact4">Stefan</string>
+    <string name="error_user_not_found">User not found, please register</string>
+    <string name="error_user_exist">User already exists</string>
 </resources>

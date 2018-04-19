@@ -1,18 +1,25 @@
 package stefan.jovanovic.chatapplication;
 
 public class ContactClass {
-    private String tvName;
+    private String tvFirstName;
+    private String tvLastName;
+    private String tvUserName;
 
-    public ContactClass(String tvName) {
-        this.tvName = tvName;
+    public ContactClass(String tvFirstName, String tvLastName, String tvUserName) {
+        this.tvFirstName = tvFirstName;
+        this.tvLastName = tvLastName;
+        this.tvUserName = tvUserName;
     }
 
-    public String getTvName() {
-        return tvName;
+    public String gettvFirstName() {
+        return tvFirstName;
     }
 
-    public void setTvName(String tvName) {
-        this.tvName = tvName;
+    public String getTvLastName() {
+        return tvLastName;
     }
 
+    public String getTvUserName() {
+        return tvUserName;
+    }
 }

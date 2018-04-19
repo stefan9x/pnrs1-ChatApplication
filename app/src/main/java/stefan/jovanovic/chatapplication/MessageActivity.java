@@ -92,14 +92,14 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
 
         // Shows toast message if send button is pressed and clears message field
         if (view.getId() == R.id.btn_send) {
-            messagelistadapter.addMessagesClass(new MessageClass(etMessage.getText().toString(), "User"));
-            chatBot(etMessage.getText().toString());
+            //messagelistadapter.addMessagesClass(new MessageClass(etMessage.getText().toString(), "User"));
+            //chatBot(etMessage.getText().toString());
             Toast.makeText(this, getText(R.string.message_sent), Toast.LENGTH_SHORT).show();
             etMessage.getText().clear();
         }
     }
 
-    public void chatBot(String text) {
+   /* public void chatBot(String text) {
 
         // Simple chat bot
         if (text.toLowerCase().contains("hello")) {
@@ -120,7 +120,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
         else if(text.toLowerCase().contains("bye")){
             messagelistadapter.addMessagesClass(new MessageClass("Bye!", "Bot"));
         }
-    }
+    }*/
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {

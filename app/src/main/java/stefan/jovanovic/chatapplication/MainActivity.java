@@ -18,6 +18,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private Button btnRegister;
     private int backbtn_counter;
 
+    private ChatDbHelper chatDbHelper;
+
     public TextWatcher twLogin = new TextWatcher() {
 
         @Override
@@ -78,6 +80,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         // Disables login button on activity create
         btnLogin.setEnabled(false);
+
+        chatDbHelper = new ChatDbHelper(this);
     }
 
     @Override
@@ -87,10 +91,30 @@ public class MainActivity extends Activity implements View.OnClickListener {
             Intent RegisterActivity_intent = new Intent(MainActivity.this, RegisterActivity.class);
             startActivity(RegisterActivity_intent);
         }
+
         //Starting contacts activity with login button
         if (view.getId() == R.id.btn_login){
             Intent ContactsActivity_intent = new Intent(MainActivity.this, ContactsActivity.class);
-            startActivity(ContactsActivity_intent);
+
+            ContactsActivity_intent.putExtra("contact_username", etUsername.getText().toString());
+            ContactClass[] contacts = chatDbHelper.readContacts();
+
+            int found = 0;
+
+            if (contacts != null) {
+                for (int i = 0; i < contacts.length; i++) {
+                    if ((contacts[i].getTvUserName().compareTo(etUsername.getText().toString())) == 0) {
+                        found = 1;
+                    }
+                }
+            }
+
+            if (found == 1){
+                startActivity(ContactsActivity_intent);
+            }
+            else{
+                Toast.makeText(this, getText(R.string.error_user_not_found), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

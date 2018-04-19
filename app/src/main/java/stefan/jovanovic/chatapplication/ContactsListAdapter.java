@@ -23,8 +23,19 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
         arlstContacts = new ArrayList<ContactClass>();
     }
 
-    public void addContactClass(ContactClass contacts){
-        arlstContacts.add(contacts);
+    public void update(ContactClass[] contacts) {
+        arlstContacts.clear();
+        if(contacts != null) {
+            for(ContactClass contact : contacts) {
+                arlstContacts.add(contact);
+            }
+        }
+
+        notifyDataSetChanged();
+    }
+
+    public void removecontact(int position){
+        arlstContacts.remove(position);
         notifyDataSetChanged();
     }
 
@@ -72,14 +83,15 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
         int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
 
         // Getting first letter from name
-        holder.tvFirstletter.setText(contactclass.getTvName().substring(0,1).toUpperCase());
+        holder.tvFirstletter.setText(contactclass.gettvFirstName().substring(0,1).toUpperCase());
         holder.tvFirstletter.setBackgroundColor(color);
 
         // Setting text to name
-        holder.tvName.setText(contactclass.getTvName());
+        String name = contactclass.gettvFirstName() + " " + contactclass.getTvLastName();
+        holder.tvName.setText(name);
 
         // Setting contact name on button tag
-        holder.imgbtnSend.setTag(contactclass.getTvName());
+        holder.imgbtnSend.setTag(contactclass.gettvFirstName() + " " + contactclass.getTvLastName());
 
         return view;
     }
