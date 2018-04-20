@@ -11,19 +11,16 @@ public class ChatDbHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 1;
 
     public static final String TABLE_NAME_CONTACTS = "contact";
-    public static final String COLUMN_CONTACT_ID = "ContactId";
+    public static final String COLUMN_CONTACT_ID = "";
     public static final String COLUMN_FIRST_NAME = "FirstName";
     public static final String COLUMN_LAST_NAME = "LastName";
     public static final String COLUMN_USERNAME = "UserName";
 
     public static final String TABLE_NAME_MESSAGES = "message";
-    public static final String COLUMN_MESSAGE_ID = "MessageId";
+    public static final String COLUMN_MESSAGE_ID = "";
     public static final String COLUMN_SENDER_ID = "SenderId";
     public static final String COLUMN_RECEIVER_ID = "ReceiverId";
     public static final String COLUMN_MESSAGE = "Message";
-
-    public int contact_id = 0;
-    public int message_id = 0;
 
     public ChatDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -32,13 +29,13 @@ public class ChatDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_NAME_CONTACTS + " (" +
-                COLUMN_CONTACT_ID + " TEXT, " +
+                COLUMN_CONTACT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                 COLUMN_FIRST_NAME + " TEXT, " +
                 COLUMN_LAST_NAME + " TEXT, " +
                 COLUMN_USERNAME + " TEXT);" );
 
         db.execSQL("CREATE TABLE " + TABLE_NAME_MESSAGES + " (" +
-                COLUMN_MESSAGE_ID + " TEXT, " +
+                COLUMN_MESSAGE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                 COLUMN_SENDER_ID + " TEXT, " +
                 COLUMN_RECEIVER_ID + " TEXT, " +
                 COLUMN_MESSAGE + " TEXT);" );
@@ -53,12 +50,10 @@ public class ChatDbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(COLUMN_CONTACT_ID, Integer.toString(contact_id));
-        values.put(COLUMN_FIRST_NAME, contact.gettvFirstName());
-        values.put(COLUMN_LAST_NAME, contact.getTvLastName());
-        values.put(COLUMN_USERNAME, contact.getTvUserName());
-
-        contact_id++;
+        values.put(COLUMN_CONTACT_ID, contact.getsId());
+        values.put(COLUMN_FIRST_NAME, contact.getsFirstName());
+        values.put(COLUMN_LAST_NAME, contact.getsLastName());
+        values.put(COLUMN_USERNAME, contact.getsUserName());
 
         db.insert(TABLE_NAME_CONTACTS, null, values);
         close();
@@ -68,12 +63,10 @@ public class ChatDbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(COLUMN_MESSAGE_ID, Integer.toString(message_id));
+        values.put(COLUMN_MESSAGE_ID, message.getsId());
         values.put(COLUMN_SENDER_ID, message.getsSenderId());
         values.put(COLUMN_RECEIVER_ID, message.getsReceiverId());
         values.put(COLUMN_MESSAGE, message.getsMessage());
-
-        message_id++;
 
         db.insert(TABLE_NAME_MESSAGES, null, values);
         close();
@@ -116,11 +109,12 @@ public class ChatDbHelper extends SQLiteOpenHelper {
     }
 
     private ContactClass createContacts(Cursor cursor) {
+        String id = cursor.getString(cursor.getColumnIndex(COLUMN_CONTACT_ID));
         String firstName = cursor.getString(cursor.getColumnIndex(COLUMN_FIRST_NAME));
         String lastName = cursor.getString(cursor.getColumnIndex(COLUMN_LAST_NAME));
         String userName = cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME));
-
-        return new ContactClass(firstName, lastName, userName);
+        
+        return new ContactClass(id, firstName, lastName, userName);
     }
 
     //////////////////////////////////

@@ -5,8 +5,9 @@ public class MessageClass {
     private String sMessage;
     private String sSenderId;
     private String sReceiverId;
+    private String sId;
 
-    public MessageClass(String sMessage, String sSenderId, String sReceiverId) {
+    public MessageClass(String sMessage, String sSenderId, String sReceiverId, ) {
         this.sMessage = sMessage;
         this.sSenderId = sSenderId;
         this.sReceiverId = sReceiverId;
@@ -22,6 +23,10 @@ public class MessageClass {
 
     public String getsReceiverId() {
         return sReceiverId;
+    }
+
+    public String getsId() {
+        return sId;
     }
 }
 

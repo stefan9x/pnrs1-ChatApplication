@@ -18,7 +18,18 @@
             android:layout_centerInParent="true"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:text="@string/my_chat_list"/>
+            android:id="@+id/logged_in_as_text"
+            android:text="@string/logged_in_user"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/logged_user"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:paddingLeft="10dp"
+            android:layout_toRightOf="@+id/logged_in_as_text"
+            android:layout_centerInParent="true"/>
 
         <Button
             android:layout_width="wrap_content"

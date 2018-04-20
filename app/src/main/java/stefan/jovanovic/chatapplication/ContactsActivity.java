@@ -8,12 +8,15 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class ContactsActivity extends Activity implements View.OnClickListener, AdapterView.OnItemLongClickListener {
 
     private ListView lvContacts;
     private Button btnLogout;
+    private TextView etLoggedinas;
 
     private ContactsListAdapter contactslistadapter;
     private ChatDbHelper chatDbHelper;
@@ -35,6 +38,10 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
         // Setting adapter to contacts list
         lvContacts.setAdapter(contactslistadapter);
         lvContacts.setOnItemLongClickListener(this);
+
+        etLoggedinas = findViewById(R.id.logged_user);
+        Intent main_intent = getIntent();
+        etLoggedinas.setText(main_intent.getStringExtra("contact_username"));
 
         chatDbHelper = new ChatDbHelper(this);
     }

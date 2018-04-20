@@ -1,25 +1,30 @@
 package stefan.jovanovic.chatapplication;
 
 public class ContactClass {
-    private String tvFirstName;
-    private String tvLastName;
-    private String tvUserName;
+    private String sFirstName;
+    private String sLastName;
+    private String sUserName;
+    private String sId;
 
-    public ContactClass(String tvFirstName, String tvLastName, String tvUserName) {
-        this.tvFirstName = tvFirstName;
-        this.tvLastName = tvLastName;
-        this.tvUserName = tvUserName;
+    public ContactClass(String tvUserId, String sFirstName, String tvLastName, String tvUserName) {
+        this.sFirstName = sFirstName;
+        this.sLastName = sLastName;
+        this.sUserName = sUserName;
     }
 
-    public String gettvFirstName() {
-        return tvFirstName;
+    public String getsFirstName() {
+        return sFirstName;
     }
 
-    public String getTvLastName() {
-        return tvLastName;
+    public String getsLastName() {
+        return sLastName;
     }
 
-    public String getTvUserName() {
-        return tvUserName;
+    public String getsUserName() {
+        return sUserName;
+    }
+
+    public String getsId() {
+        return sId;
     }
 }
