@@ -106,13 +106,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
             if (contacts != null) {
                 for (int i = 0; i < contacts.length; i++) {
                     if ((contacts[i].getsUserName().compareTo(etUsername.getText().toString())) == 0) {
-                        editor.putString("userId", contacts[i].getsId());
+                        editor.putString("loggedin_userId", contacts[i].getsId());
+                        editor.apply();
                         found = 1;
                     }
                 }
             }
-
-            editor.apply();
 
             if (found == 1){
                 startActivity(ContactsActivity_intent);

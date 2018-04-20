@@ -3,6 +3,7 @@ package stefan.jovanovic.chatapplication;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -26,6 +27,8 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
 
     private MessageListAdapter messagelistadapter = new MessageListAdapter(this);
 
+    public static final String MY_PREFS_NAME = "PrefsFile";
+    public String receiver_userid;
     public TextWatcher twSend = new TextWatcher() {
 
         @Override
@@ -62,8 +65,21 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
         lvMessages = findViewById(R.id.messages_list);
 
         // Contact name in upper corner
-        Intent contacts_intent = getIntent();
-        tvContactname.setText(contacts_intent.getStringExtra("contact_name"));
+        SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+        receiver_userid = prefs.getString("receiver_userId", null);
+
+        ChatDbHelper chatDbHelper = new ChatDbHelper(this);
+        ContactClass[] contacts = chatDbHelper.readContacts();;
+
+        if (contacts != null) {
+            for (int i = 0; i < contacts.length; i++) {
+                if (contacts[i].getsId().compareTo(receiver_userid) == 0){
+                    String receiver_user= contacts[i].getsFirstName() + " " + contacts[i].getsLastName();
+                    tvContactname.setText(receiver_user);
+                    break;
+                }
+            }
+        }
 
         // Setting adapter to list
         lvMessages.setAdapter(messagelistadapter);

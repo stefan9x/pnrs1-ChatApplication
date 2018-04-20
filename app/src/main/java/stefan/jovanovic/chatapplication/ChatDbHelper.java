@@ -11,13 +11,13 @@ public class ChatDbHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 1;
 
     public static final String TABLE_NAME_CONTACTS = "contact";
-    public static final String COLUMN_CONTACT_ID = "";
+    public static final String COLUMN_CONTACT_ID = "ContactId";
     public static final String COLUMN_FIRST_NAME = "FirstName";
     public static final String COLUMN_LAST_NAME = "LastName";
     public static final String COLUMN_USERNAME = "UserName";
 
     public static final String TABLE_NAME_MESSAGES = "message";
-    public static final String COLUMN_MESSAGE_ID = "";
+    public static final String COLUMN_MESSAGE_ID = "MessageId";
     public static final String COLUMN_SENDER_ID = "SenderId";
     public static final String COLUMN_RECEIVER_ID = "ReceiverId";
     public static final String COLUMN_MESSAGE = "Message";
@@ -42,9 +42,7 @@ public class ChatDbHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-
-    }
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) { }
 
     public void insert_contacts(ContactClass contact) {
         SQLiteDatabase db = getWritableDatabase();
@@ -102,9 +100,9 @@ public class ChatDbHelper extends SQLiteOpenHelper {
         return contacts;
     }*/
 
-    public void deleteContact(String contactUsername) {
+    public void deleteContact(String contactId) {
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(TABLE_NAME_CONTACTS, COLUMN_USERNAME + "=?", new String[] {contactUsername});
+        db.delete(TABLE_NAME_CONTACTS, COLUMN_CONTACT_ID + "=?", new String[] {contactId});
         close();
     }
 

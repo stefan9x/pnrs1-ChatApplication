@@ -6,7 +6,8 @@ public class ContactClass {
     private String sUserName;
     private String sId;
 
-    public ContactClass(String tvUserId, String sFirstName, String tvLastName, String tvUserName) {
+    public ContactClass(String sUserId, String sFirstName, String sLastName, String sUserName) {
+        this.sId = sUserId;
         this.sFirstName = sFirstName;
         this.sLastName = sLastName;
         this.sUserName = sUserName;

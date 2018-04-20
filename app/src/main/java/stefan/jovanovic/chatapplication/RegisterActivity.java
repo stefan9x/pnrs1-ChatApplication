@@ -148,8 +148,8 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
             if (found == 1){
                 Toast.makeText(this, getText(R.string.error_user_exist), Toast.LENGTH_SHORT).show();
             } else{
-                ContactClass contact = new ContactClass(etFirstName.getText().toString(), etLastname.getText().toString(),
-                        etUsername.getText().toString(), null);
+                ContactClass contact = new ContactClass(null, etFirstName.getText().toString(), etLastname.getText().toString(),
+                        etUsername.getText().toString());
                 chatDbHelper.insert_contacts(contact);
                 Intent MainActivity_intent = new Intent (RegisterActivity.this, MainActivity.class);
                 startActivity(MainActivity_intent);

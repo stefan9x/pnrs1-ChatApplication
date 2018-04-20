@@ -2,6 +2,7 @@ package stefan.jovanovic.chatapplication;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,8 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
 
     private Context cContext;
     private ArrayList<ContactClass> arlstContacts;
+
+    public static final String MY_PREFS_NAME = "PrefsFile";
 
     public ContactsListAdapter(Context context){
         cContext = context;
@@ -91,7 +94,7 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
         holder.tvName.setText(name);
 
         // Setting contact name on button tag
-        holder.imgbtnSend.setTag(contactclass.getsFirstName() + " " + contactclass.getsLastName());
+        holder.imgbtnSend.setTag(contactclass.getsId());
 
         return view;
     }
@@ -100,7 +103,11 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
     public void onClick(View view) {
         if (view.getId() == R.id.imgbtn_send){
             Intent intMessageactivity = new Intent(cContext.getApplicationContext(), MessageActivity.class);
-            intMessageactivity.putExtra("contact_name", view.getTag().toString());
+            SharedPreferences.Editor editor = cContext.getSharedPreferences(MY_PREFS_NAME, cContext.MODE_PRIVATE).edit();
+
+            editor.putString("receiver_userId", view.getTag().toString());
+            editor.apply();
+
             cContext.startActivity(intMessageactivity);
         }
     }

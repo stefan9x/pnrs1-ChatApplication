@@ -23,11 +23,17 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
     private ChatDbHelper chatDbHelper;
 
     public static final String MY_PREFS_NAME = "PrefsFile";
+    public String userId;
+
+    public ContactClass[] contacts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
+
+        chatDbHelper = new ChatDbHelper(this);
+        contacts = chatDbHelper.readContacts();
 
         lvContacts = findViewById(R.id.contacts_list);
         btnLogout = findViewById(R.id.btn_logout);
@@ -45,10 +51,18 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
         etLoggedinas = findViewById(R.id.logged_user);
 
         SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
-        String userId = prefs.getString("userId", null);
-        etLoggedinas.setText(userId);
+        userId = prefs.getString("loggedin_userId", null);
 
-        chatDbHelper = new ChatDbHelper(this);
+        if (contacts != null) {
+            for (int i = 0; i < contacts.length; i++) {
+                if (contacts[i].getsId().compareTo(userId) == 0){
+                    String loggedin_user = contacts[i].getsUserName() + "(" + contacts[i].getsFirstName() +
+                            " " + contacts[i].getsLastName() + ")";
+                    etLoggedinas.setText(loggedin_user);
+                    break;
+                }
+            }
+        }
     }
 
     @Override
@@ -83,7 +97,15 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
             public void onClick(DialogInterface dialog, int which) {
                 //do your work here
                 ContactClass contact = (ContactClass) contactslistadapter.getItem(deletePos);
-                chatDbHelper.deleteContact(contact.getsUserName());
+
+                if (contacts != null) {
+                    for (int i = 0; i < contacts.length; i++) {
+                        if (contacts[i].getsId().compareTo(contact.getsId()) == 0){
+                            chatDbHelper.deleteContact(contact.getsId());
+                            break;
+                        }
+                    }
+                }
 
                 deleteMe();
             }
@@ -104,15 +126,13 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
     }
 
     public void deleteMe(){
-        Intent main_intent = getIntent();
-        String username = main_intent.getStringExtra("contact_username");
 
-        ContactClass[] contacts = chatDbHelper.readContacts();
+        contacts = chatDbHelper.readContacts();
         contactslistadapter.update(contacts);
 
         if (contacts != null) {
             for (int i = 0; i < contacts.length; i++) {
-                if (contacts[i].getsUserName().compareTo(username) == 0){
+                if (contacts[i].getsId().compareTo(userId) == 0){
                     contactslistadapter.removecontact(i);
                     break;
                 }
