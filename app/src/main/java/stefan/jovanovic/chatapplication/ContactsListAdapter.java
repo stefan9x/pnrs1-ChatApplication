@@ -103,8 +103,8 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
     public void onClick(View view) {
         if (view.getId() == R.id.imgbtn_send){
             Intent intMessageactivity = new Intent(cContext.getApplicationContext(), MessageActivity.class);
-            SharedPreferences.Editor editor = cContext.getSharedPreferences(MY_PREFS_NAME, cContext.MODE_PRIVATE).edit();
 
+            SharedPreferences.Editor editor = cContext.getSharedPreferences(MY_PREFS_NAME, cContext.MODE_PRIVATE).edit();
             editor.putString("receiver_userId", view.getTag().toString());
             editor.apply();
 

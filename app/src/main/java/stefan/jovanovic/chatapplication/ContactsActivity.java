@@ -21,11 +21,10 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
     private ContactsListAdapter contactslistadapter;
     private ChatDbHelper chatDbHelper;
+    private ContactClass[] contacts;
 
-    public static final String MY_PREFS_NAME = "PrefsFile";
-    public String userId;
-
-    public ContactClass[] contacts;
+    private static final String MY_PREFS_NAME = "PrefsFile";
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,19 +94,19 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //do your work here
-                ContactClass contact = (ContactClass) contactslistadapter.getItem(deletePos);
+        //do your work here
+        ContactClass contact = (ContactClass) contactslistadapter.getItem(deletePos);
 
-                if (contacts != null) {
-                    for (int i = 0; i < contacts.length; i++) {
-                        if (contacts[i].getsId().compareTo(contact.getsId()) == 0){
-                            chatDbHelper.deleteContact(contact.getsId());
-                            break;
-                        }
-                    }
+        if (contacts != null) {
+            for (int i = 0; i < contacts.length; i++) {
+                if (contacts[i].getsId().compareTo(contact.getsId()) == 0){
+                    chatDbHelper.deleteContact(contact.getsId());
+                    break;
                 }
+            }
+        }
 
-                deleteMe();
+        deleteMe();
             }
         });
 

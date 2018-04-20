@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -27,9 +28,14 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
 
     private MessageListAdapter messagelistadapter = new MessageListAdapter(this);
 
-    public static final String MY_PREFS_NAME = "PrefsFile";
-    public String receiver_userid;
-    public TextWatcher twSend = new TextWatcher() {
+    private static final String MY_PREFS_NAME = "PrefsFile";
+    private String receiver_userid;
+    private String sender_userid;
+
+    private ChatDbHelper chatDbHelper;
+    private MessageClass[] messages;
+
+    private TextWatcher twSend = new TextWatcher() {
 
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -58,18 +64,20 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
 
+        // Contact name in upper corner
+        SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+        receiver_userid = prefs.getString("receiver_userId", null);
+        sender_userid = prefs.getString("loggedin_userId", null);
+
         btnLogout = findViewById(R.id.btn_logout_message);
         btnSend = findViewById(R.id.btn_send);
         etMessage = findViewById(R.id.et_message);
         tvContactname = findViewById(R.id.tv_message_contact_name);
         lvMessages = findViewById(R.id.messages_list);
 
-        // Contact name in upper corner
-        SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
-        receiver_userid = prefs.getString("receiver_userId", null);
+        chatDbHelper = new ChatDbHelper(this);
 
-        ChatDbHelper chatDbHelper = new ChatDbHelper(this);
-        ContactClass[] contacts = chatDbHelper.readContacts();;
+        ContactClass[] contacts = chatDbHelper.readContacts();
 
         if (contacts != null) {
             for (int i = 0; i < contacts.length; i++) {
@@ -99,6 +107,15 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        messages = chatDbHelper.readMessages(sender_userid, receiver_userid);
+        messagelistadapter.update(messages);
+
+    }
+
+    @Override
     public void onClick(View view) {
         // Starts main activity if logout button is pressed
         if (view.getId() == R.id.btn_logout_message) {
@@ -108,7 +125,13 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
 
         // Shows toast message if send button is pressed and clears message field
         if (view.getId() == R.id.btn_send) {
-            //messagelistadapter.addMessagesClass(new MessageClass(etMessage.getText().toString(), "User"));
+
+            MessageClass message = new MessageClass(null, sender_userid, receiver_userid,
+                    etMessage.getText().toString());
+            chatDbHelper.insert_message(message);
+            messages = chatDbHelper.readMessages(sender_userid, receiver_userid);
+            messagelistadapter.update(messages);
+
             //chatBot(etMessage.getText().toString());
             Toast.makeText(this, getText(R.string.message_sent), Toast.LENGTH_SHORT).show();
             etMessage.getText().clear();
@@ -153,7 +176,18 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 //do your work here
-                messagelistadapter.removeMessagesClass(deletePos);
+                MessageClass message = (MessageClass) messagelistadapter.getItem(deletePos);
+
+                if (messages != null) {
+                    for (int i = 0; i < messages.length; i++) {
+                        if (messages[i].getsId().compareTo(message.getsId()) == 0){
+                            chatDbHelper.deleteMessage(message.getsId());
+                            break;
+                        }
+                    }
+                }
+                messages = chatDbHelper.readMessages(sender_userid, receiver_userid);
+                messagelistadapter.update(messages);
             }
         });
 

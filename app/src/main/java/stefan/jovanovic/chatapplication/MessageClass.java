@@ -2,17 +2,16 @@ package stefan.jovanovic.chatapplication;
 
 public class MessageClass {
 
-    private String sMessage;
+    private String sMessageId;
     private String sSenderId;
     private String sReceiverId;
-    private String sId;
+    private String sMessage;
 
-    public MessageClass(String sId, String sSenderId, String sReceiverId, String sMessage) {
-        this.sId = sId;
+    public MessageClass(String sMessageId, String sSenderId, String sReceiverId, String sMessage) {
+        this.sMessageId = sMessageId;
         this.sSenderId = sSenderId;
         this.sReceiverId = sReceiverId;
         this.sMessage = sMessage;
-
     }
 
     public String getsMessage() {
@@ -28,7 +27,7 @@ public class MessageClass {
     }
 
     public String getsId() {
-        return sId;
+        return sMessageId;
     }
 }
 

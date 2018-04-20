@@ -1,6 +1,7 @@
 package stefan.jovanovic.chatapplication;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -18,13 +19,20 @@ public class MessageListAdapter extends BaseAdapter {
     private Context cContext;
     private ArrayList<MessageClass> arlstMessages;
 
+    private static final String MY_PREFS_NAME = "PrefsFile";
+
     public MessageListAdapter(Context context){
         cContext = context;
         arlstMessages = new ArrayList<MessageClass>();
     }
 
-    public void addMessagesClass(MessageClass message){
-        arlstMessages.add(message);
+    public void update(MessageClass[] messages){
+        arlstMessages.clear();
+        if(messages != null) {
+            for(MessageClass message : messages) {
+                arlstMessages.add(message);
+            }
+        }
         notifyDataSetChanged();
     }
 
@@ -73,30 +81,30 @@ public class MessageListAdapter extends BaseAdapter {
         MessageClass messageclass = (MessageClass) getItem(position);
         MessageListAdapter.MessageHolder holder = (MessageListAdapter.MessageHolder) view.getTag();
 
-
         holder.tvMessage.setText(messageclass.getsMessage());
 
         // Setting time
         holder.tvTime.setText(new SimpleDateFormat("HH:mm").format(Calendar.getInstance().getTime()));
 
-        /*// Setting text and background colors and gravity based on user
-        if (holder.sUser.contentEquals("User")){
+        SharedPreferences prefs = cContext.getSharedPreferences(MY_PREFS_NAME, cContext.MODE_PRIVATE);
+        String sender_userid = prefs.getString("loggedin_userId", null);
+
+        // Setting text and background colors and gravity based on user
+        if ((messageclass.getsSenderId().compareTo(sender_userid)==0)){
             holder.tvMessage.setGravity(Gravity.RIGHT|Gravity.CENTER);
             holder.tvMessage.setTextColor(Color.rgb(255, 255,255));
             holder.tvMessage.setBackgroundColor(Color.argb(50,173,173,173));
             holder.tvTime.setGravity(Gravity.RIGHT);
             holder.tvTime.setTextColor(Color.rgb(255, 255,255));
             holder.tvTime.setBackgroundColor(Color.argb(50,173,173,173));
-        }
-
-        if (holder.sUser.equals("Bot")){
+        }else {
             holder.tvMessage.setGravity(Gravity.LEFT|Gravity.CENTER);
             holder.tvMessage.setTextColor(Color.rgb(234, 117,0));
             holder.tvMessage.setBackgroundColor(Color.argb(0,255,255,255));
             holder.tvTime.setGravity(Gravity.LEFT);
             holder.tvTime.setTextColor(Color.rgb(234, 117,0));
             holder.tvTime.setBackgroundColor(Color.argb(0,255,255,255));
-        }*/
+        }
 
         return view;
     }

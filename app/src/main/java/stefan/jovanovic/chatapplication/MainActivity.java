@@ -98,6 +98,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         //Starting contacts activity with login button
         if (view.getId() == R.id.btn_login){
             Intent ContactsActivity_intent = new Intent(MainActivity.this, ContactsActivity.class);
+
             ContactClass[] contacts = chatDbHelper.readContacts();
             SharedPreferences.Editor editor = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
 
