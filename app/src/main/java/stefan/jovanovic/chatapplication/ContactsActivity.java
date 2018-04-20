@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -20,6 +21,8 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
     private ContactsListAdapter contactslistadapter;
     private ChatDbHelper chatDbHelper;
+
+    public static final String MY_PREFS_NAME = "PrefsFile";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +43,10 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
         lvContacts.setOnItemLongClickListener(this);
 
         etLoggedinas = findViewById(R.id.logged_user);
-        Intent main_intent = getIntent();
-        etLoggedinas.setText(main_intent.getStringExtra("contact_username"));
+
+        SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+        String userId = prefs.getString("userId", null);
+        etLoggedinas.setText(userId);
 
         chatDbHelper = new ChatDbHelper(this);
     }
@@ -78,7 +83,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
             public void onClick(DialogInterface dialog, int which) {
                 //do your work here
                 ContactClass contact = (ContactClass) contactslistadapter.getItem(deletePos);
-                chatDbHelper.deleteContact(contact.getTvUserName());
+                chatDbHelper.deleteContact(contact.getsUserName());
 
                 deleteMe();
             }
@@ -107,7 +112,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
         if (contacts != null) {
             for (int i = 0; i < contacts.length; i++) {
-                if (contacts[i].getTvUserName().compareTo(username) == 0){
+                if (contacts[i].getsUserName().compareTo(username) == 0){
                     contactslistadapter.removecontact(i);
                     break;
                 }

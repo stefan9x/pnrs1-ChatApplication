@@ -159,6 +159,6 @@ public class ChatDbHelper extends SQLiteOpenHelper {
         String sSenderId = cursor.getString(cursor.getColumnIndex(COLUMN_SENDER_ID));
         String sReceiverId = cursor.getString(cursor.getColumnIndex(COLUMN_RECEIVER_ID));
 
-        return new MessageClass(sMessage, sSenderId, sReceiverId);
+        return new MessageClass(sMessage, sSenderId, sReceiverId, null);
     }
 }

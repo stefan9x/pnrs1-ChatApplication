@@ -2,6 +2,7 @@ package stefan.jovanovic.chatapplication;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -19,6 +20,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private int backbtn_counter;
 
     private ChatDbHelper chatDbHelper;
+
+    public static final String MY_PREFS_NAME = "PrefsFile";
 
     public TextWatcher twLogin = new TextWatcher() {
 
@@ -95,19 +98,21 @@ public class MainActivity extends Activity implements View.OnClickListener {
         //Starting contacts activity with login button
         if (view.getId() == R.id.btn_login){
             Intent ContactsActivity_intent = new Intent(MainActivity.this, ContactsActivity.class);
-
-            ContactsActivity_intent.putExtra("contact_username", etUsername.getText().toString());
             ContactClass[] contacts = chatDbHelper.readContacts();
+            SharedPreferences.Editor editor = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
 
             int found = 0;
 
             if (contacts != null) {
                 for (int i = 0; i < contacts.length; i++) {
-                    if ((contacts[i].getTvUserName().compareTo(etUsername.getText().toString())) == 0) {
+                    if ((contacts[i].getsUserName().compareTo(etUsername.getText().toString())) == 0) {
+                        editor.putString("userId", contacts[i].getsId());
                         found = 1;
                     }
                 }
             }
+
+            editor.apply();
 
             if (found == 1){
                 startActivity(ContactsActivity_intent);

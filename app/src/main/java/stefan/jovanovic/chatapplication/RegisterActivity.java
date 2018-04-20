@@ -138,7 +138,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
 
             if (contacts != null) {
                 for (int i = 0; i < contacts.length; i++) {
-                    if (contacts[i].getTvUserName().compareTo(etUsername.getText().toString()) == 0){
+                    if (contacts[i].getsUserName().compareTo(etUsername.getText().toString()) == 0){
                         found = 1;
                         break;
                     }
@@ -149,7 +149,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
                 Toast.makeText(this, getText(R.string.error_user_exist), Toast.LENGTH_SHORT).show();
             } else{
                 ContactClass contact = new ContactClass(etFirstName.getText().toString(), etLastname.getText().toString(),
-                        etUsername.getText().toString());
+                        etUsername.getText().toString(), null);
                 chatDbHelper.insert_contacts(contact);
                 Intent MainActivity_intent = new Intent (RegisterActivity.this, MainActivity.class);
                 startActivity(MainActivity_intent);

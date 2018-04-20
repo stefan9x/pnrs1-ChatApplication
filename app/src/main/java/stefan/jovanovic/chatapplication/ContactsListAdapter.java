@@ -83,15 +83,15 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
         int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
 
         // Getting first letter from name
-        holder.tvFirstletter.setText(contactclass.gettvFirstName().substring(0,1).toUpperCase());
+        holder.tvFirstletter.setText(contactclass.getsFirstName().substring(0,1).toUpperCase());
         holder.tvFirstletter.setBackgroundColor(color);
 
         // Setting text to name
-        String name = contactclass.gettvFirstName() + " " + contactclass.getTvLastName();
+        String name = contactclass.getsFirstName() + " " + contactclass.getsLastName();
         holder.tvName.setText(name);
 
         // Setting contact name on button tag
-        holder.imgbtnSend.setTag(contactclass.gettvFirstName() + " " + contactclass.getTvLastName());
+        holder.imgbtnSend.setTag(contactclass.getsFirstName() + " " + contactclass.getsLastName());
 
         return view;
     }

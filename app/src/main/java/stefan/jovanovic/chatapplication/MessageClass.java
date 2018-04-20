@@ -7,10 +7,11 @@ public class MessageClass {
     private String sReceiverId;
     private String sId;
 
-    public MessageClass(String sMessage, String sSenderId, String sReceiverId, ) {
+    public MessageClass(String sMessage, String sSenderId, String sReceiverId, String sId) {
         this.sMessage = sMessage;
         this.sSenderId = sSenderId;
         this.sReceiverId = sReceiverId;
+        this.sId = sId;
     }
 
     public String getsMessage() {
