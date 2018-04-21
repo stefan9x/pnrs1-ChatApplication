@@ -99,33 +99,38 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         //Starting contacts activity with login button
         if (view.getId() == R.id.btn_login) {
-            Intent ContactsActivity_intent = new Intent(MainActivity.this, ContactsActivity.class);
 
-            // Reading contacts from database
-            ContactClass[] contacts = chatDbHelper.readContacts();
+            if (etUsername.getText().toString().compareTo("chatbot") == 0) {
+                Toast.makeText(this, getText(R.string.error_cannot_login_chatbot), Toast.LENGTH_SHORT).show();
+            } else {
+                Intent ContactsActivity_intent = new Intent(MainActivity.this, ContactsActivity.class);
 
-            // Shared preferences editor
-            SharedPreferences.Editor editor = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
+                // Reading contacts from database
+                ContactClass[] contacts = chatDbHelper.readContacts();
 
-            int found = 0;
+                // Shared preferences editor
+                SharedPreferences.Editor editor = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
 
-            // Checking if user is in database
-            if (contacts != null) {
-                for (int i = 0; i < contacts.length; i++) {
-                    // If user is found, put userid into SharedPreferences file
-                    if ((contacts[i].getsUserName().compareTo(etUsername.getText().toString())) == 0) {
-                        editor.putString("loggedin_userId", contacts[i].getsUserId());
-                        editor.apply();
-                        found = 1;
+                int found = 0;
+
+                // Checking if user is in database
+                if (contacts != null) {
+                    for (int i = 0; i < contacts.length; i++) {
+                        // If user is found, put userid into SharedPreferences file
+                        if ((contacts[i].getsUserName().compareTo(etUsername.getText().toString())) == 0) {
+                            editor.putString("loggedin_userId", contacts[i].getsUserId());
+                            editor.apply();
+                            found = 1;
+                        }
                     }
                 }
-            }
 
-            // If user is found, start contacts activity, else show toast
-            if (found == 1) {
-                startActivity(ContactsActivity_intent);
-            } else {
-                Toast.makeText(this, getText(R.string.error_user_not_found), Toast.LENGTH_SHORT).show();
+                // If user is found, start contacts activity, else show toast
+                if (found == 1) {
+                    startActivity(ContactsActivity_intent);
+                } else {
+                    Toast.makeText(this, getText(R.string.error_user_not_found), Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }

@@ -31,6 +31,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
     private static final String MY_PREFS_NAME = "PrefsFile";
     private String receiver_userid;
     private String sender_userid;
+    private String receiver_username;
 
     private ChatDbHelper chatDbHelper;
     private MessageClass[] messages;
@@ -87,6 +88,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
                 if (contacts[i].getsUserId().compareTo(receiver_userid) == 0) {
                     String receiver_user = contacts[i].getsFirstName() + " " + contacts[i].getsLastName();
                     tvContactname.setText(receiver_user);
+                    receiver_username = contacts[i].getsUserName();
                     break;
                 }
             }
@@ -133,36 +135,44 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
             chatDbHelper.insert_message(message);
             updateMessagesList(sender_userid, receiver_userid);
 
-            //chatBot(etMessage.getText().toString());
+            if (receiver_username.compareTo("chatbot") == 0) {
+                chatBot(etMessage.getText().toString());
+            }
 
             // Shows toast if send button is pressed and clears message field
             Toast.makeText(this, getText(R.string.message_sent), Toast.LENGTH_SHORT).show();
             etMessage.getText().clear();
+
+
         }
     }
 
-   /* public void chatBot(String text) {
+    // Simple chat bot
+    public void chatBot(String text) {
 
-        // Simple chat bot
+        String bot_message = null;
+
         if (text.toLowerCase().contains("hello")) {
-            messagelistadapter.addMessagesClass(new MessageClass("Hey!", "Bot"));
+            bot_message = "Hey!";
+        } else if (text.toLowerCase().contains("how")) {
+            bot_message = "I'm fine thanks, you?";
+        } else if (text.toLowerCase().contains("what")) {
+            bot_message = "Nothing special.";
+        } else if (text.toLowerCase().contains("yes")) {
+            bot_message = "what yes?";
+        } else if (text.toLowerCase().contains("no")) {
+            bot_message = "what no?";
+        } else if (text.toLowerCase().contains("bye")) {
+            bot_message = "Bye!";
         }
-        else if (text.toLowerCase().contains("how")) {
-            messagelistadapter.addMessagesClass(new MessageClass("I'm fine thanks, you?", "Bot"));
+
+        // Send message if bot has an answer
+        if (bot_message != null) {
+            MessageClass message = new MessageClass(null, receiver_userid, sender_userid, bot_message);
+            chatDbHelper.insert_message(message);
+            updateMessagesList(sender_userid, receiver_userid);
         }
-        else if (text.toLowerCase().contains("what")) {
-            messagelistadapter.addMessagesClass(new MessageClass("Nothing special.", "Bot"));
-        }
-        else if (text.toLowerCase().contains("yes")) {
-            messagelistadapter.addMessagesClass(new MessageClass("what yes?", "Bot"));
-        }
-        else if(text.toLowerCase().contains("no")){
-            messagelistadapter.addMessagesClass(new MessageClass("what no?", "Bot"));
-        }
-        else if(text.toLowerCase().contains("bye")){
-            messagelistadapter.addMessagesClass(new MessageClass("Bye!", "Bot"));
-        }
-    }*/
+    }
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {

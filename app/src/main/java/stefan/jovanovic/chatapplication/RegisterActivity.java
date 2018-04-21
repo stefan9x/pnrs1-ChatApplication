@@ -135,31 +135,38 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
         // Starts contacts activity if register button is pressed
 
         if (view.getId() == R.id.btn_new_register) {
-            int found = 0;
 
-            // Reading contacts from database
-            ContactClass[] contacts = chatDbHelper.readContacts();
+            // Check if trying to register with username "chatbot"
+            // if yes, show toast, else do login
+            if (etUsername.getText().toString().compareTo("chatbot") == 0) {
+                Toast.makeText(this, getText(R.string.error_cannot_register_chatbot), Toast.LENGTH_SHORT).show();
+            } else {
+                int found = 0;
 
-            // Checking if user with that username is already in database
-            if (contacts != null) {
-                for (int i = 0; i < contacts.length; i++) {
-                    if (contacts[i].getsUserName().compareTo(etUsername.getText().toString()) == 0) {
-                        found = 1;
-                        break;
+                // Reading contacts from database
+                ContactClass[] contacts = chatDbHelper.readContacts();
+
+                // Checking if user with that username is already in database
+                if (contacts != null) {
+                    for (int i = 0; i < contacts.length; i++) {
+                        if (contacts[i].getsUserName().compareTo(etUsername.getText().toString()) == 0) {
+                            found = 1;
+                            break;
+                        }
                     }
                 }
-            }
 
-            // If yes display toast, else create new user in database, and start mainactivity
-            if (found == 1) {
-                Toast.makeText(this, getText(R.string.error_user_exist), Toast.LENGTH_SHORT).show();
-            } else {
-                ContactClass contact = new ContactClass(null, etFirstName.getText().toString(), etLastname.getText().toString(),
-                        etUsername.getText().toString());
-                chatDbHelper.insert_contacts(contact);
+                // If yes display toast, else create new user in database, and start main activity
+                if (found == 1) {
+                    Toast.makeText(this, getText(R.string.error_user_exist), Toast.LENGTH_SHORT).show();
+                } else {
+                    ContactClass contact = new ContactClass(null, etFirstName.getText().toString(), etLastname.getText().toString(),
+                            etUsername.getText().toString());
+                    chatDbHelper.insert_contacts(contact);
 
-                Intent MainActivity_intent = new Intent(RegisterActivity.this, MainActivity.class);
-                startActivity(MainActivity_intent);
+                    Intent MainActivity_intent = new Intent(RegisterActivity.this, MainActivity.class);
+                    startActivity(MainActivity_intent);
+                }
             }
         }
     }

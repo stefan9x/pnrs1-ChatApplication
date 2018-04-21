@@ -133,7 +133,27 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
     // Function for deleting current logged in user
     // from contact list and updating that list
+    // and adding bot to database
     public void deleteLoggeduserFromList() {
+
+        // Checking if bot is in database
+        int found_bot = 0;
+
+        if (contacts != null) {
+            for (int i = 0; i < contacts.length; i++) {
+                if (contacts[i].getsUserName().compareTo("chatbot") == 0) {
+                    found_bot = 1;
+                    break;
+                }
+            }
+
+        }
+
+        // If bot is not found, then create it, if yes skip
+        if (found_bot == 0) {
+            ContactClass contact = new ContactClass(null, "Chat", "Bot", "chatbot");
+            chatDbHelper.insert_contacts(contact);
+        }
 
         contacts = chatDbHelper.readContacts();
         contactslistadapter.update(contacts);
