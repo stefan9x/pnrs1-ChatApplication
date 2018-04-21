@@ -18,7 +18,7 @@ import android.widget.Toast;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 
-public class MessageActivity extends Activity implements View.OnClickListener, AdapterView.OnItemLongClickListener{
+public class MessageActivity extends Activity implements View.OnClickListener, AdapterView.OnItemLongClickListener {
 
     private Button btnLogout;
     private Button btnSend;
@@ -75,14 +75,17 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
         tvContactname = findViewById(R.id.tv_message_contact_name);
         lvMessages = findViewById(R.id.messages_list);
 
+        // New chatdbhelper instance
         chatDbHelper = new ChatDbHelper(this);
 
+        // Reading contacts from database
         ContactClass[] contacts = chatDbHelper.readContacts();
 
+        // Setting receiver contact name in top left corner
         if (contacts != null) {
             for (int i = 0; i < contacts.length; i++) {
-                if (contacts[i].getsId().compareTo(receiver_userid) == 0){
-                    String receiver_user= contacts[i].getsFirstName() + " " + contacts[i].getsLastName();
+                if (contacts[i].getsUserId().compareTo(receiver_userid) == 0) {
+                    String receiver_user = contacts[i].getsFirstName() + " " + contacts[i].getsLastName();
                     tvContactname.setText(receiver_user);
                     break;
                 }
@@ -110,9 +113,8 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
     protected void onResume() {
         super.onResume();
 
-        messages = chatDbHelper.readMessages(sender_userid, receiver_userid);
-        messagelistadapter.update(messages);
-
+        // Update messages list
+        updateMessagesList(sender_userid, receiver_userid);
     }
 
     @Override
@@ -123,16 +125,17 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
             startActivity(intMainactivity);
         }
 
-        // Shows toast message if send button is pressed and clears message field
         if (view.getId() == R.id.btn_send) {
 
+            // Inserting message into database and updating messages list
             MessageClass message = new MessageClass(null, sender_userid, receiver_userid,
                     etMessage.getText().toString());
             chatDbHelper.insert_message(message);
-            messages = chatDbHelper.readMessages(sender_userid, receiver_userid);
-            messagelistadapter.update(messages);
+            updateMessagesList(sender_userid, receiver_userid);
 
             //chatBot(etMessage.getText().toString());
+
+            // Shows toast if send button is pressed and clears message field
             Toast.makeText(this, getText(R.string.message_sent), Toast.LENGTH_SHORT).show();
             etMessage.getText().clear();
         }
@@ -166,42 +169,57 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
 
         final int deletePos = position;
 
-        // Delete confirmation dialog
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Delete?");
-        alert.setMessage("Are you sure you want to delete message?");
+        final MessageClass message = (MessageClass) messagelistadapter.getItem(deletePos);
 
-        alert.setPositiveButton("YES", new OnClickListener() {
+        // Check if user is deleting his messages, if not, show toast
+        if (message.getsSenderId().compareTo(sender_userid) == 0) {
+            // Delete confirmation dialog
+            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+            alert.setTitle(getText(R.string.dialog_delete_title));
+            alert.setMessage(getText(R.string.dialog_delete_message_confirmation_text));
 
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                //do your work here
-                MessageClass message = (MessageClass) messagelistadapter.getItem(deletePos);
+            alert.setPositiveButton(getText(R.string.dialog_delete_positive_btn), new OnClickListener() {
 
-                if (messages != null) {
-                    for (int i = 0; i < messages.length; i++) {
-                        if (messages[i].getsId().compareTo(message.getsId()) == 0){
-                            chatDbHelper.deleteMessage(message.getsId());
-                            break;
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                    // Deleting message from database
+                    if (messages != null) {
+                        for (int i = 0; i < messages.length; i++) {
+                            if (messages[i].getsMessageId().compareTo(message.getsMessageId()) == 0) {
+                                chatDbHelper.deleteMessage(message.getsMessageId());
+                                break;
+                            }
                         }
                     }
+
+                    // Updating messages list
+                    updateMessagesList(sender_userid, receiver_userid);
                 }
-                messages = chatDbHelper.readMessages(sender_userid, receiver_userid);
-                messagelistadapter.update(messages);
-            }
-        });
+            });
 
-        alert.setNegativeButton("NO", new OnClickListener() {
+            alert.setNegativeButton(getText(R.string.dialog_delete_negative_btn), new OnClickListener() {
 
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
 
-                dialog.dismiss();
-            }
-        });
+                    dialog.dismiss();
+                }
+            });
 
-        alert.show();
+            alert.show();
 
-        return true;
+            return true;
+        } else {
+            Toast.makeText(this, getText(R.string.error_delete_only_your_messages), Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+
+    // Function for reading messages from database
+    // and updating messages list
+    public void updateMessagesList(String senderid, String receiverid) {
+        messages = chatDbHelper.readMessages(senderid, receiverid);
+        messagelistadapter.update(messages);
     }
 }

@@ -14,7 +14,7 @@ import android.widget.Toast;
 import java.util.Date;
 
 
-public class RegisterActivity extends Activity implements View.OnClickListener{
+public class RegisterActivity extends Activity implements View.OnClickListener {
 
     private EditText etUsername;
     private EditText etPassword;
@@ -29,10 +29,12 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
     public TextWatcher twRegister = new TextWatcher() {
 
         @Override
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
 
         @Override
-        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
 
         @Override
         public void afterTextChanged(Editable e) {
@@ -47,42 +49,42 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
             boolean bUsername, bPassword, bEmail, bFistName, bLastName;
 
             // Checks if users entered email in correct format
-            if(android.util.Patterns.EMAIL_ADDRESS.matcher(sEmail).matches()){
+            if (android.util.Patterns.EMAIL_ADDRESS.matcher(sEmail).matches()) {
                 bEmail = true;
-            } else{
+            } else {
                 // Display error if email is incorrectly typed
                 etEmail.setError(getText(R.string.error_email));
                 bEmail = false;
             }
 
             // Checks if username is entered
-            if (sUsername.length()>0){
+            if (sUsername.length() > 0) {
                 bUsername = true;
-            } else{
+            } else {
                 bUsername = false;
                 etUsername.setError(getText(R.string.error_username));
             }
 
             // Checks if password with minimum of 6 characters is entered
-            if (sPassword.length()>5){
+            if (sPassword.length() > 5) {
                 bPassword = true;
-            } else{
+            } else {
                 // Display error if password is too short
                 etPassword.setError(getText(R.string.error_password_minimum));
                 bPassword = false;
             }
 
-            if (sFistName.length()>0){
+            if (sFistName.length() > 0) {
                 bFistName = true;
-            } else{
+            } else {
                 // Display error if password is too short
                 etFirstName.setError(getText(R.string.error_username));
                 bFistName = false;
             }
 
-            if (sLastName.length()>0){
+            if (sLastName.length() > 0) {
                 bLastName = true;
-            } else{
+            } else {
                 // Display error if password is too short
                 etLastname.setError(getText(R.string.error_username));
                 bLastName = false;
@@ -91,7 +93,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
             // Enables register button if required fields are filled
             if (bEmail && bUsername && bPassword && bFistName && bLastName) {
                 btnRegister.setEnabled(true);
-            } else{
+            } else {
                 btnRegister.setEnabled(false);
             }
         }
@@ -124,6 +126,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
         // Adds register button listeners
         btnRegister.setOnClickListener(this);
 
+        // New chatdbhelper instance
         chatDbHelper = new ChatDbHelper(this);
     }
 
@@ -131,27 +134,31 @@ public class RegisterActivity extends Activity implements View.OnClickListener{
     public void onClick(View view) {
         // Starts contacts activity if register button is pressed
 
-        if (view.getId() == R.id.btn_new_register){
+        if (view.getId() == R.id.btn_new_register) {
             int found = 0;
 
+            // Reading contacts from database
             ContactClass[] contacts = chatDbHelper.readContacts();
 
+            // Checking if user with that username is already in database
             if (contacts != null) {
                 for (int i = 0; i < contacts.length; i++) {
-                    if (contacts[i].getsUserName().compareTo(etUsername.getText().toString()) == 0){
+                    if (contacts[i].getsUserName().compareTo(etUsername.getText().toString()) == 0) {
                         found = 1;
                         break;
                     }
                 }
             }
 
-            if (found == 1){
+            // If yes display toast, else create new user in database, and start mainactivity
+            if (found == 1) {
                 Toast.makeText(this, getText(R.string.error_user_exist), Toast.LENGTH_SHORT).show();
-            } else{
+            } else {
                 ContactClass contact = new ContactClass(null, etFirstName.getText().toString(), etLastname.getText().toString(),
                         etUsername.getText().toString());
                 chatDbHelper.insert_contacts(contact);
-                Intent MainActivity_intent = new Intent (RegisterActivity.this, MainActivity.class);
+
+                Intent MainActivity_intent = new Intent(RegisterActivity.this, MainActivity.class);
                 startActivity(MainActivity_intent);
             }
         }

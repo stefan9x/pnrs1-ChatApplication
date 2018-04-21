@@ -26,7 +26,7 @@ public class MessageClass {
         return sReceiverId;
     }
 
-    public String getsId() {
+    public String getsMessageId() {
         return sMessageId;
     }
 }

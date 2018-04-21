@@ -17,7 +17,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
     private ListView lvContacts;
     private Button btnLogout;
-    private TextView etLoggedinas;
+    private TextView tvLoggedinas;
 
     private ContactsListAdapter contactslistadapter;
     private ChatDbHelper chatDbHelper;
@@ -31,11 +31,13 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
 
+        // New chatdbhelper instance and reading contacts from database
         chatDbHelper = new ChatDbHelper(this);
         contacts = chatDbHelper.readContacts();
 
         lvContacts = findViewById(R.id.contacts_list);
         btnLogout = findViewById(R.id.btn_logout);
+        tvLoggedinas = findViewById(R.id.logged_user);
 
         // Adds logout button listener
         btnLogout.setOnClickListener(this);
@@ -47,17 +49,18 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
         lvContacts.setAdapter(contactslistadapter);
         lvContacts.setOnItemLongClickListener(this);
 
-        etLoggedinas = findViewById(R.id.logged_user);
-
+        // Getting logged user userid, from SharedPreference file
         SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
         userId = prefs.getString("loggedin_userId", null);
 
+        // Searching for logged in user in database,
+        // and setting his username, first and last name to textview
         if (contacts != null) {
             for (int i = 0; i < contacts.length; i++) {
-                if (contacts[i].getsId().compareTo(userId) == 0){
+                if (contacts[i].getsUserId().compareTo(userId) == 0) {
                     String loggedin_user = contacts[i].getsUserName() + "(" + contacts[i].getsFirstName() +
                             " " + contacts[i].getsLastName() + ")";
-                    etLoggedinas.setText(loggedin_user);
+                    tvLoggedinas.setText(loggedin_user);
                     break;
                 }
             }
@@ -68,7 +71,8 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
     protected void onResume() {
         super.onResume();
 
-        deleteMe();
+        // Deleting logged user from contacts list
+        deleteLoggeduserFromList();
     }
 
     @Override
@@ -87,30 +91,33 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
         // Delete confirmation dialog
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Delete?");
-        alert.setMessage("Are you sure you want to delete contact?");
+        alert.setTitle(getText(R.string.dialog_delete_title));
+        alert.setMessage(getText(R.string.dialog_delete_contact_confirmation_text));
 
-        alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+        alert.setPositiveButton(getText(R.string.dialog_delete_positive_btn), new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-        //do your work here
-        ContactClass contact = (ContactClass) contactslistadapter.getItem(deletePos);
 
-        if (contacts != null) {
-            for (int i = 0; i < contacts.length; i++) {
-                if (contacts[i].getsId().compareTo(contact.getsId()) == 0){
-                    chatDbHelper.deleteContact(contact.getsId());
-                    break;
+                // Deleting contact on long press
+                ContactClass contact = (ContactClass) contactslistadapter.getItem(deletePos);
+
+                if (contacts != null) {
+                    for (int i = 0; i < contacts.length; i++) {
+                        if (contacts[i].getsUserId().compareTo(contact.getsUserId()) == 0) {
+                            chatDbHelper.deleteContact(contact.getsUserId());
+                            break;
+                        }
+                    }
                 }
-            }
-        }
 
-        deleteMe();
+                // Deleting current logged in user from contact list
+                deleteLoggeduserFromList();
+
             }
         });
 
-        alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+        alert.setNegativeButton(getText(R.string.dialog_delete_negative_btn), new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -124,14 +131,16 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
         return true;
     }
 
-    public void deleteMe(){
+    // Function for deleting current logged in user
+    // from contact list and updating that list
+    public void deleteLoggeduserFromList() {
 
         contacts = chatDbHelper.readContacts();
         contactslistadapter.update(contacts);
 
         if (contacts != null) {
             for (int i = 0; i < contacts.length; i++) {
-                if (contacts[i].getsId().compareTo(userId) == 0){
+                if (contacts[i].getsUserId().compareTo(userId) == 0) {
                     contactslistadapter.removecontact(i);
                     break;
                 }

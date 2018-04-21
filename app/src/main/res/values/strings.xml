@@ -21,10 +21,12 @@
     <string name="message_sent">"Message is sent!"</string>
     <string name="error_username">Type username</string>
     <string name="logged_in_user">Logged in as: </string>
-    <string name="contact1">Jelena</string>
-    <string name="contact2">Aleksandar</string>
-    <string name="contact3">Djole</string>
-    <string name="contact4">Stefan</string>
     <string name="error_user_not_found">User not found, please register</string>
     <string name="error_user_exist">User already exists</string>
+    <string name="dialog_delete_title">Delete?</string>
+    <string name="dialog_delete_contact_confirmation_text">Are you sure you want to delete contact?</string>
+    <string name="dialog_delete_message_confirmation_text">Are you sure you want to delete message?</string>
+    <string name="dialog_delete_positive_btn">Yes</string>
+    <string name="dialog_delete_negative_btn">No</string>
+    <string name="error_delete_only_your_messages">You can only delete your messages</string>
 </resources>

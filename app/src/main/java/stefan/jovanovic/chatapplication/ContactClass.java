@@ -4,10 +4,10 @@ public class ContactClass {
     private String sFirstName;
     private String sLastName;
     private String sUserName;
-    private String sId;
+    private String sUserId;
 
     public ContactClass(String sUserId, String sFirstName, String sLastName, String sUserName) {
-        this.sId = sUserId;
+        this.sUserId = sUserId;
         this.sFirstName = sFirstName;
         this.sLastName = sLastName;
         this.sUserName = sUserName;
@@ -25,7 +25,7 @@ public class ContactClass {
         return sUserName;
     }
 
-    public String getsId() {
-        return sId;
+    public String getsUserId() {
+        return sUserId;
     }
 }

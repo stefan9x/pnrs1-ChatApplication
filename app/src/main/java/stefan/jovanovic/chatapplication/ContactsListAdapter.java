@@ -14,30 +14,31 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class ContactsListAdapter extends BaseAdapter implements View.OnClickListener{
+import static android.content.Context.MODE_PRIVATE;
+
+public class ContactsListAdapter extends BaseAdapter implements View.OnClickListener {
 
     private Context cContext;
     private ArrayList<ContactClass> arlstContacts;
 
     public static final String MY_PREFS_NAME = "PrefsFile";
 
-    public ContactsListAdapter(Context context){
+    public ContactsListAdapter(Context context) {
         cContext = context;
         arlstContacts = new ArrayList<ContactClass>();
     }
 
     public void update(ContactClass[] contacts) {
         arlstContacts.clear();
-        if(contacts != null) {
-            for(ContactClass contact : contacts) {
+        if (contacts != null) {
+            for (ContactClass contact : contacts) {
                 arlstContacts.add(contact);
             }
         }
-
         notifyDataSetChanged();
     }
 
-    public void removecontact(int position){
+    public void removecontact(int position) {
         arlstContacts.remove(position);
         notifyDataSetChanged();
     }
@@ -50,9 +51,9 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
     @Override
     public Object getItem(int position) {
         Object contact = null;
-        try{
+        try {
             contact = arlstContacts.get(position);
-        } catch (IndexOutOfBoundsException e){
+        } catch (IndexOutOfBoundsException e) {
             e.printStackTrace();
         }
         return contact;
@@ -66,7 +67,7 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
     @Override
     public View getView(int position, View view, ViewGroup parent) {
 
-        if (view == null){
+        if (view == null) {
             LayoutInflater inflater = (LayoutInflater) cContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.layout_contact, null);
 
@@ -86,35 +87,37 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
         int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
 
         // Getting first letter from name
-        holder.tvFirstletter.setText(contactclass.getsFirstName().substring(0,1).toUpperCase());
+        holder.tvFirstletter.setText(contactclass.getsFirstName().substring(0, 1).toUpperCase());
         holder.tvFirstletter.setBackgroundColor(color);
 
         // Setting text to name
         String name = contactclass.getsFirstName() + " " + contactclass.getsLastName();
         holder.tvName.setText(name);
 
-        // Setting contact name on button tag
-        holder.imgbtnSend.setTag(contactclass.getsId());
+        // Setting contact id on button tag
+        holder.imgbtnSend.setTag(contactclass.getsUserId());
 
         return view;
     }
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.imgbtn_send){
+        if (view.getId() == R.id.imgbtn_send) {
             Intent intMessageactivity = new Intent(cContext.getApplicationContext(), MessageActivity.class);
 
-            SharedPreferences.Editor editor = cContext.getSharedPreferences(MY_PREFS_NAME, cContext.MODE_PRIVATE).edit();
+            // Putting receiver userid into SharedPreference file
+            SharedPreferences.Editor editor = cContext.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
             editor.putString("receiver_userId", view.getTag().toString());
             editor.apply();
 
+            // Starting message activity
             cContext.startActivity(intMessageactivity);
         }
     }
 
-    private class ContactHolder{
-        public TextView tvFirstletter = null;
-        public TextView tvName = null;
-        public ImageButton imgbtnSend = null;
+    private class ContactHolder {
+        private TextView tvFirstletter = null;
+        private TextView tvName = null;
+        private ImageButton imgbtnSend = null;
     }
 }

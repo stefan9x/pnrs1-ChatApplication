@@ -26,10 +26,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
     public TextWatcher twLogin = new TextWatcher() {
 
         @Override
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
 
         @Override
-        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
 
         @Override
         public void afterTextChanged(Editable e) {
@@ -41,7 +43,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
             // check if username and password fields are filled correctly
             //  to enable Login button
-            if (sUsername.length() > 0)  {
+            if (sUsername.length() > 0) {
                 bUsername = true;
             } else {
                 bUsername = false;
@@ -55,7 +57,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 etPassword.setError(getText(R.string.error_password_minimum));
             }
 
-            if (bUsername && bPassword){
+            if (bUsername && bPassword) {
                 btnLogin.setEnabled(true);
             } else {
                 btnLogin.setEnabled(false);
@@ -96,44 +98,48 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
 
         //Starting contacts activity with login button
-        if (view.getId() == R.id.btn_login){
+        if (view.getId() == R.id.btn_login) {
             Intent ContactsActivity_intent = new Intent(MainActivity.this, ContactsActivity.class);
 
+            // Reading contacts from database
             ContactClass[] contacts = chatDbHelper.readContacts();
+
+            // Shared preferences editor
             SharedPreferences.Editor editor = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
 
             int found = 0;
 
+            // Checking if user is in database
             if (contacts != null) {
                 for (int i = 0; i < contacts.length; i++) {
+                    // If user is found, put userid into SharedPreferences file
                     if ((contacts[i].getsUserName().compareTo(etUsername.getText().toString())) == 0) {
-                        editor.putString("loggedin_userId", contacts[i].getsId());
+                        editor.putString("loggedin_userId", contacts[i].getsUserId());
                         editor.apply();
                         found = 1;
                     }
                 }
             }
 
-            if (found == 1){
+            // If user is found, start contacts activity, else show toast
+            if (found == 1) {
                 startActivity(ContactsActivity_intent);
-            }
-            else{
+            } else {
                 Toast.makeText(this, getText(R.string.error_user_not_found), Toast.LENGTH_SHORT).show();
             }
         }
     }
 
+    // Double press back button to exit app
     @Override
-    public void onBackPressed()
-    {
+    public void onBackPressed() {
         //Display toast message if user try to leave main activity with back button
-        if(backbtn_counter >= 1) {
+        if (backbtn_counter >= 1) {
             Intent Exit_intent = new Intent(Intent.ACTION_MAIN);
             Exit_intent.addCategory(Intent.CATEGORY_HOME);
             Exit_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(Exit_intent);
-        }
-        else {
+        } else {
             Toast.makeText(this, getText(R.string.main_activity_backbtn_toast), Toast.LENGTH_SHORT).show();
             backbtn_counter++;
         }
