@@ -164,6 +164,8 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
             bot_message = "what no?";
         } else if (text.toLowerCase().contains("bye")) {
             bot_message = "Bye!";
+        } else {
+            bot_message = "Lol, nope " + new String(Character.toChars(0x1F595));
         }
 
         // Send message if bot has an answer
