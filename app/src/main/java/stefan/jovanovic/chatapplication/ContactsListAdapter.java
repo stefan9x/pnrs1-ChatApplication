@@ -28,6 +28,7 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
         arlstContacts = new ArrayList<ContactClass>();
     }
 
+    // Update contacts list
     public void update(ContactClass[] contacts) {
         arlstContacts.clear();
         if (contacts != null) {
@@ -38,6 +39,7 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
         notifyDataSetChanged();
     }
 
+    // Remove contact from list
     public void removecontact(int position) {
         arlstContacts.remove(position);
         notifyDataSetChanged();

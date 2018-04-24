@@ -37,13 +37,6 @@ public class MessageListAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    public void removeMessagesClass(int position) {
-
-        arlstMessages.remove(position);
-        notifyDataSetChanged();
-
-    }
-
     @Override
     public int getCount() {
         return arlstMessages.size();

@@ -132,7 +132,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
             // Inserting message into database and updating messages list
             MessageClass message = new MessageClass(null, sender_userid, receiver_userid,
                     etMessage.getText().toString());
-            chatDbHelper.insert_message(message);
+            chatDbHelper.insertMessage(message);
             updateMessagesList(sender_userid, receiver_userid);
 
             if (receiver_username.compareTo("chatbot") == 0) {
@@ -171,7 +171,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
         // Send message if bot has an answer
         if (bot_message != null) {
             MessageClass message = new MessageClass(null, receiver_userid, sender_userid, bot_message);
-            chatDbHelper.insert_message(message);
+            chatDbHelper.insertMessage(message);
             updateMessagesList(sender_userid, receiver_userid);
         }
     }

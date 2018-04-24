@@ -132,8 +132,8 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        // Starts contacts activity if register button is pressed
 
+        // Starts contacts activity if register button is pressed
         if (view.getId() == R.id.btn_new_register) {
 
             // Check if trying to register with username "chatbot"
@@ -162,7 +162,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
                 } else {
                     ContactClass contact = new ContactClass(null, etFirstName.getText().toString(), etLastname.getText().toString(),
                             etUsername.getText().toString());
-                    chatDbHelper.insert_contacts(contact);
+                    chatDbHelper.insertContact(contact);
 
                     Intent MainActivity_intent = new Intent(RegisterActivity.this, MainActivity.class);
                     startActivity(MainActivity_intent);

@@ -152,7 +152,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
         // If bot is not found, then create it, if yes skip
         if (found_bot == 0) {
             ContactClass contact = new ContactClass(null, "Chat", "Bot", "chatbot");
-            chatDbHelper.insert_contacts(contact);
+            chatDbHelper.insertContact(contact);
         }
 
         contacts = chatDbHelper.readContacts();

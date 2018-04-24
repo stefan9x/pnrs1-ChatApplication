@@ -28,12 +28,14 @@ public class ChatDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        // Create contacts table
         db.execSQL("CREATE TABLE " + TABLE_NAME_CONTACTS + " (" +
                 COLUMN_CONTACT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                 COLUMN_FIRST_NAME + " TEXT, " +
                 COLUMN_LAST_NAME + " TEXT, " +
                 COLUMN_USERNAME + " TEXT);");
 
+        // Create messages table
         db.execSQL("CREATE TABLE " + TABLE_NAME_MESSAGES + " (" +
                 COLUMN_MESSAGE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                 COLUMN_SENDER_ID + " TEXT, " +
@@ -45,7 +47,8 @@ public class ChatDbHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
     }
 
-    public void insert_contacts(ContactClass contact) {
+    // Insert contacts into database
+    public void insertContact(ContactClass contact) {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -58,19 +61,17 @@ public class ChatDbHelper extends SQLiteOpenHelper {
         close();
     }
 
-    public void insert_message(MessageClass message) {
-        SQLiteDatabase db = getWritableDatabase();
+    // Create contact class object based on cursor
+    private ContactClass createContact(Cursor cursor) {
+        String id = cursor.getString(cursor.getColumnIndex(COLUMN_CONTACT_ID));
+        String firstName = cursor.getString(cursor.getColumnIndex(COLUMN_FIRST_NAME));
+        String lastName = cursor.getString(cursor.getColumnIndex(COLUMN_LAST_NAME));
+        String userName = cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME));
 
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_MESSAGE_ID, message.getsMessageId());
-        values.put(COLUMN_SENDER_ID, message.getsSenderId());
-        values.put(COLUMN_RECEIVER_ID, message.getsReceiverId());
-        values.put(COLUMN_MESSAGE, message.getsMessage());
-
-        db.insert(TABLE_NAME_MESSAGES, null, values);
-        close();
+        return new ContactClass(id, firstName, lastName, userName);
     }
 
+    // Read contacts from database
     public ContactClass[] readContacts() {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(TABLE_NAME_CONTACTS, null, null, null, null, null, null, null);
@@ -83,45 +84,63 @@ public class ChatDbHelper extends SQLiteOpenHelper {
 
         int i = 0;
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-            contacts[i++] = createContacts(cursor);
+            contacts[i++] = createContact(cursor);
         }
 
         close();
         return contacts;
     }
 
+    // Not used
+    // Read one contact from database
     public ContactClass readContact(String conctactId) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(TABLE_NAME_CONTACTS, null, COLUMN_CONTACT_ID + "=?",
                 new String[]{conctactId}, null, null, null);
         cursor.moveToFirst();
-        ContactClass contacts = createContacts(cursor);
+        ContactClass contacts = createContact(cursor);
 
         close();
         return contacts;
     }
 
+    // Delete one contact from database
     public void deleteContact(String contactId) {
         SQLiteDatabase db = getWritableDatabase();
         db.delete(TABLE_NAME_CONTACTS, COLUMN_CONTACT_ID + "=?", new String[]{contactId});
         close();
     }
 
-    // Create contacts
-    private ContactClass createContacts(Cursor cursor) {
-        String id = cursor.getString(cursor.getColumnIndex(COLUMN_CONTACT_ID));
-        String firstName = cursor.getString(cursor.getColumnIndex(COLUMN_FIRST_NAME));
-        String lastName = cursor.getString(cursor.getColumnIndex(COLUMN_LAST_NAME));
-        String userName = cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME));
+        // Insert messages into database
+    public void insertMessage(MessageClass message) {
+        SQLiteDatabase db = getWritableDatabase();
 
-        return new ContactClass(id, firstName, lastName, userName);
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_MESSAGE_ID, message.getsMessageId());
+        values.put(COLUMN_SENDER_ID, message.getsSenderId());
+        values.put(COLUMN_RECEIVER_ID, message.getsReceiverId());
+        values.put(COLUMN_MESSAGE, message.getsMessage());
+
+        db.insert(TABLE_NAME_MESSAGES, null, values);
+        close();
     }
 
-    // Read messages
+    // Create message class object based on cursor
+    private MessageClass createMessage(Cursor cursor) {
+        String sMessageId = cursor.getString(cursor.getColumnIndex(COLUMN_MESSAGE_ID));
+        String sSenderId = cursor.getString(cursor.getColumnIndex(COLUMN_SENDER_ID));
+        String sReceiverId = cursor.getString(cursor.getColumnIndex(COLUMN_RECEIVER_ID));
+        String sMessage = cursor.getString(cursor.getColumnIndex(COLUMN_MESSAGE));
+
+        return new MessageClass(sMessageId, sSenderId, sReceiverId, sMessage);
+    }
+
+    // Read messages, and filter messages for logged in user and receiver user
     public MessageClass[] readMessages(String sender, String receiver) {
         SQLiteDatabase db = getReadableDatabase();
 
-        Cursor cursor = db.query(TABLE_NAME_MESSAGES, null, "(SenderId =? AND ReceiverId =?) OR (SenderId =? AND ReceiverId =?)", new String[]{sender, receiver, receiver, sender}, null, null, null, null);
+        Cursor cursor = db.query(TABLE_NAME_MESSAGES, null, "(SenderId =? AND ReceiverId =?) OR (SenderId =? AND ReceiverId =?)",
+                                new String[]{sender, receiver, receiver, sender}, null, null, null, null);
 
         if (cursor.getCount() <= 0) {
             return null;
@@ -137,7 +156,8 @@ public class ChatDbHelper extends SQLiteOpenHelper {
         return messages;
     }
 
-    // Read message
+    // Read one message from database
+    // Not used
     public MessageClass readMessage(String messageId) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.query(TABLE_NAME_MESSAGES, null, COLUMN_MESSAGE_ID + "=?",
@@ -149,18 +169,10 @@ public class ChatDbHelper extends SQLiteOpenHelper {
         return message;
     }
 
+    // Delete one message
     public void deleteMessage(String messageId) {
         SQLiteDatabase db = getWritableDatabase();
         db.delete(TABLE_NAME_MESSAGES, COLUMN_MESSAGE_ID + "=?", new String[]{messageId});
         close();
-    }
-
-    private MessageClass createMessage(Cursor cursor) {
-        String sMessageId = cursor.getString(cursor.getColumnIndex(COLUMN_MESSAGE_ID));
-        String sSenderId = cursor.getString(cursor.getColumnIndex(COLUMN_SENDER_ID));
-        String sReceiverId = cursor.getString(cursor.getColumnIndex(COLUMN_RECEIVER_ID));
-        String sMessage = cursor.getString(cursor.getColumnIndex(COLUMN_MESSAGE));
-
-        return new MessageClass(sMessageId, sSenderId, sReceiverId, sMessage);
     }
 }
