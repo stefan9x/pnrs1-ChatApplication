@@ -72,9 +72,18 @@ public class ChatDbHelper extends SQLiteOpenHelper {
     }
 
     // Read contacts from database
-    public ContactClass[] readContacts() {
+    public ContactClass[] readContacts(String loggedinuserid) {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.query(TABLE_NAME_CONTACTS, null, null, null, null, null, null, null);
+
+        Cursor cursor;
+
+        if (loggedinuserid == null) {
+            cursor = db.query(TABLE_NAME_CONTACTS, null, null,
+                    null, null, null, null, null);
+        } else {
+            cursor = db.query(TABLE_NAME_CONTACTS, null, COLUMN_CONTACT_ID + "!=?",
+                    new String[]{loggedinuserid}, null, null, null, null);
+        }
 
         if (cursor.getCount() <= 0) {
             return null;
@@ -93,15 +102,44 @@ public class ChatDbHelper extends SQLiteOpenHelper {
 
     // Not used
     // Read one contact from database
-    public ContactClass readContact(String conctactId) {
+    public ContactClass readContact(String username, String contactid) {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.query(TABLE_NAME_CONTACTS, null, COLUMN_CONTACT_ID + "=?",
-                new String[]{conctactId}, null, null, null);
+
+        Cursor cursor;
+
+        if (username == null && contactid != null) {
+            cursor = db.query(TABLE_NAME_CONTACTS, null, COLUMN_CONTACT_ID + "=?",
+                    new String[]{contactid}, null, null, null);
+        } else if (username != null && contactid == null) {
+            cursor = db.query(TABLE_NAME_CONTACTS, null, COLUMN_USERNAME + "=?",
+                    new String[]{username}, null, null, null);
+        } else {
+            return null;
+        }
+
         cursor.moveToFirst();
-        ContactClass contacts = createContact(cursor);
+        ContactClass contact = createContact(cursor);
 
         close();
-        return contacts;
+        return contact;
+    }
+
+    // Search for contact by username in database
+    public boolean searchContactByUsername(String username) {
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_NAME_CONTACTS, null, COLUMN_USERNAME + "=?",
+                new String[]{username}, null, null, null, null);
+
+        if (cursor.getCount() <= 0) {
+            db.close();
+            cursor.close();
+            return false;
+        } else {
+            db.close();
+            cursor.close();
+            return true;
+        }
     }
 
     // Delete one contact from database
@@ -111,7 +149,7 @@ public class ChatDbHelper extends SQLiteOpenHelper {
         close();
     }
 
-        // Insert messages into database
+    // Insert messages into database
     public void insertMessage(MessageClass message) {
         SQLiteDatabase db = getWritableDatabase();
 
@@ -140,7 +178,7 @@ public class ChatDbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_NAME_MESSAGES, null, "(SenderId =? AND ReceiverId =?) OR (SenderId =? AND ReceiverId =?)",
-                                new String[]{sender, receiver, receiver, sender}, null, null, null, null);
+                new String[]{sender, receiver, receiver, sender}, null, null, null, null);
 
         if (cursor.getCount() <= 0) {
             return null;

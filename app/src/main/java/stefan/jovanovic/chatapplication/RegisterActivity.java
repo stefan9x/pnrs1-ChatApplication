@@ -141,23 +141,9 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
             if (etUsername.getText().toString().compareTo("chatbot") == 0) {
                 Toast.makeText(this, getText(R.string.error_cannot_register_chatbot), Toast.LENGTH_SHORT).show();
             } else {
-                int found = 0;
-
-                // Reading contacts from database
-                ContactClass[] contacts = chatDbHelper.readContacts();
-
-                // Checking if user with that username is already in database
-                if (contacts != null) {
-                    for (int i = 0; i < contacts.length; i++) {
-                        if (contacts[i].getsUserName().compareTo(etUsername.getText().toString()) == 0) {
-                            found = 1;
-                            break;
-                        }
-                    }
-                }
 
                 // If yes display toast, else create new user in database, and start main activity
-                if (found == 1) {
+                if (chatDbHelper.searchContactByUsername(etUsername.getText().toString())) {
                     Toast.makeText(this, getText(R.string.error_user_exist), Toast.LENGTH_SHORT).show();
                 } else {
                     ContactClass contact = new ContactClass(null, etFirstName.getText().toString(), etLastname.getText().toString(),

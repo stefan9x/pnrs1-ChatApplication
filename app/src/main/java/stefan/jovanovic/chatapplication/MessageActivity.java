@@ -34,7 +34,6 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
     private String receiver_username;
 
     private ChatDbHelper chatDbHelper;
-    private MessageClass[] messages;
 
     private TextWatcher twSend = new TextWatcher() {
 
@@ -79,20 +78,10 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
         // New chatdbhelper instance
         chatDbHelper = new ChatDbHelper(this);
 
-        // Reading contacts from database
-        ContactClass[] contacts = chatDbHelper.readContacts();
-
-        // Setting receiver contact name in top left corner
-        if (contacts != null) {
-            for (int i = 0; i < contacts.length; i++) {
-                if (contacts[i].getsUserId().compareTo(receiver_userid) == 0) {
-                    String receiver_user = contacts[i].getsFirstName() + " " + contacts[i].getsLastName();
-                    tvContactname.setText(receiver_user);
-                    receiver_username = contacts[i].getsUserName();
-                    break;
-                }
-            }
-        }
+        String receiver_user = chatDbHelper.readContact(null, receiver_userid).getsFirstName() +
+                " " + chatDbHelper.readContact(null, receiver_userid).getsLastName();
+        tvContactname.setText(receiver_user);
+        receiver_username = chatDbHelper.readContact(null, receiver_userid).getsUserName();
 
         // Setting adapter to list
         lvMessages.setAdapter(messagelistadapter);
@@ -143,14 +132,13 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
             Toast.makeText(this, getText(R.string.message_sent), Toast.LENGTH_SHORT).show();
             etMessage.getText().clear();
 
-
         }
     }
 
     // Simple chat bot
     public void chatBot(String text) {
 
-        String bot_message = null;
+        String bot_message;
 
         if (text.toLowerCase().contains("hello")) {
             bot_message = "Hey!";
@@ -169,7 +157,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
         }
 
         // Send message if bot has an answer
-        if (bot_message != null) {
+        if (bot_message.length() > 0) {
             MessageClass message = new MessageClass(null, receiver_userid, sender_userid, bot_message);
             chatDbHelper.insertMessage(message);
             updateMessagesList(sender_userid, receiver_userid);
@@ -179,9 +167,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-        final int deletePos = position;
-
-        final MessageClass message = (MessageClass) messagelistadapter.getItem(deletePos);
+        final MessageClass message = (MessageClass) messagelistadapter.getItem(position);
 
         // Check if user is deleting his messages, if not, show toast
         if (message.getsSenderId().compareTo(sender_userid) == 0) {
@@ -196,14 +182,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
                 public void onClick(DialogInterface dialog, int which) {
 
                     // Deleting message from database
-                    if (messages != null) {
-                        for (int i = 0; i < messages.length; i++) {
-                            if (messages[i].getsMessageId().compareTo(message.getsMessageId()) == 0) {
-                                chatDbHelper.deleteMessage(message.getsMessageId());
-                                break;
-                            }
-                        }
-                    }
+                    chatDbHelper.deleteMessage(message.getsMessageId());
 
                     // Updating messages list
                     updateMessagesList(sender_userid, receiver_userid);
@@ -231,7 +210,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
     // Function for reading messages from database
     // and updating messages list
     public void updateMessagesList(String senderid, String receiverid) {
-        messages = chatDbHelper.readMessages(senderid, receiverid);
+        MessageClass[] messages = chatDbHelper.readMessages(senderid, receiverid);
         messagelistadapter.update(messages);
     }
 }

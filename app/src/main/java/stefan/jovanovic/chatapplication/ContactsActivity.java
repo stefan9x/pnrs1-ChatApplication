@@ -24,7 +24,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
     private ContactClass[] contacts;
 
     private static final String MY_PREFS_NAME = "PrefsFile";
-    private String userId;
+    private String loggedin_userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +33,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
         // New chatdbhelper instance and reading contacts from database
         chatDbHelper = new ChatDbHelper(this);
-        contacts = chatDbHelper.readContacts();
+        contacts = chatDbHelper.readContacts(null);
 
         lvContacts = findViewById(R.id.contacts_list);
         btnLogout = findViewById(R.id.btn_logout);
@@ -51,28 +51,24 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
         // Getting logged user userid, from SharedPreference file
         SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
-        userId = prefs.getString("loggedin_userId", null);
+        loggedin_userId = prefs.getString("loggedin_userId", null);
 
         // Searching for logged in user in database,
         // and setting his username, first and last name to textview
-        if (contacts != null) {
-            for (int i = 0; i < contacts.length; i++) {
-                if (contacts[i].getsUserId().compareTo(userId) == 0) {
-                    String loggedin_user = contacts[i].getsUserName() + "(" + contacts[i].getsFirstName() +
-                            " " + contacts[i].getsLastName() + ")";
-                    tvLoggedinas.setText(loggedin_user);
-                    break;
-                }
-            }
-        }
+
+        String loggedin_user = chatDbHelper.readContact(null, loggedin_userId).getsUserName() +
+                "(" + chatDbHelper.readContact(null, loggedin_userId).getsFirstName() +
+                " " + chatDbHelper.readContact(null, loggedin_userId).getsLastName() + ")";
+        tvLoggedinas.setText(loggedin_user);
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        // Deleting logged user from contacts list
-        deleteLoggeduserFromList();
+        // Updating list
+        updateContactList();
     }
 
     @Override
@@ -101,18 +97,10 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
                 // Deleting contact on long press
                 ContactClass contact = (ContactClass) contactslistadapter.getItem(deletePos);
+                chatDbHelper.deleteContact(contact.getsUserId());
 
-                if (contacts != null) {
-                    for (int i = 0; i < contacts.length; i++) {
-                        if (contacts[i].getsUserId().compareTo(contact.getsUserId()) == 0) {
-                            chatDbHelper.deleteContact(contact.getsUserId());
-                            break;
-                        }
-                    }
-                }
-
-                // Deleting current logged in user from contact list
-                deleteLoggeduserFromList();
+                // Updating list
+                updateContactList();
 
             }
         });
@@ -131,40 +119,15 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
         return true;
     }
 
-    // Function for deleting current logged in user
-    // from contact list and updating that list
-    // and adding bot to database
-    public void deleteLoggeduserFromList() {
+    // Updating contacts list and adding bot to database
+    public void updateContactList() {
 
-        // Checking if bot is in database
-        int found_bot = 0;
-
-        if (contacts != null) {
-            for (int i = 0; i < contacts.length; i++) {
-                if (contacts[i].getsUserName().compareTo("chatbot") == 0) {
-                    found_bot = 1;
-                    break;
-                }
-            }
-
-        }
-
-        // If bot is not found, then create it, if yes skip
-        if (found_bot == 0) {
+        if (!chatDbHelper.searchContactByUsername("chatbot")) {
             ContactClass contact = new ContactClass(null, "Chat", "Bot", "chatbot");
             chatDbHelper.insertContact(contact);
         }
 
-        contacts = chatDbHelper.readContacts();
+        contacts = chatDbHelper.readContacts(loggedin_userId);
         contactslistadapter.update(contacts);
-
-        if (contacts != null) {
-            for (int i = 0; i < contacts.length; i++) {
-                if (contacts[i].getsUserId().compareTo(userId) == 0) {
-                    contactslistadapter.removecontact(i);
-                    break;
-                }
-            }
-        }
     }
 }
