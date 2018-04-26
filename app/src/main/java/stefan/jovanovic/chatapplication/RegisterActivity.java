@@ -150,7 +150,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
                             etUsername.getText().toString());
                     chatDbHelper.insertContact(contact);
 
-                    Intent MainActivity_intent = new Intent(RegisterActivity.this, MainActivity.class);
+                    Intent MainActivity_intent = new Intent(RegisterActivity.this, LoginActivity.class);
                     startActivity(MainActivity_intent);
                 }
             }

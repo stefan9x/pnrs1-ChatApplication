@@ -9,9 +9,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ContactsActivity extends Activity implements View.OnClickListener, AdapterView.OnItemLongClickListener {
 
@@ -21,7 +21,6 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
     private ContactsListAdapter contactslistadapter;
     private ChatDbHelper chatDbHelper;
-    private ContactClass[] contacts;
 
     private static final String MY_PREFS_NAME = "PrefsFile";
     private String loggedin_userId;
@@ -31,9 +30,8 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
 
-        // New chatdbhelper instance and reading contacts from database
+        // New chatdbhelper instance
         chatDbHelper = new ChatDbHelper(this);
-        contacts = chatDbHelper.readContacts(null);
 
         lvContacts = findViewById(R.id.contacts_list);
         btnLogout = findViewById(R.id.btn_logout);
@@ -75,7 +73,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
     public void onClick(View view) {
         // Starts main activity if logout button is pressed
         if (view.getId() == R.id.btn_logout) {
-            Intent intMainactivity = new Intent(ContactsActivity.this, MainActivity.class);
+            Intent intMainactivity = new Intent(ContactsActivity.this, LoginActivity.class);
             startActivity(intMainactivity);
         }
     }
@@ -84,6 +82,11 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
 
         final int deletePos = position;
+
+        final ContactClass contact = (ContactClass) contactslistadapter.getItem(deletePos);
+        if (contact.getsUserName().compareTo("chatbot") == 0) {
+            Toast.makeText(this, getText(R.string.error_bot_respawn), Toast.LENGTH_SHORT).show();
+        }
 
         // Delete confirmation dialog
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -96,7 +99,6 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
             public void onClick(DialogInterface dialog, int which) {
 
                 // Deleting contact on long press
-                ContactClass contact = (ContactClass) contactslistadapter.getItem(deletePos);
                 chatDbHelper.deleteContact(contact.getsUserId());
 
                 // Updating list
@@ -121,6 +123,8 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
     // Updating contacts list and adding bot to database
     public void updateContactList() {
+
+        ContactClass[] contacts;
 
         if (!chatDbHelper.searchContactByUsername("chatbot")) {
             ContactClass contact = new ContactClass(null, "Chat", "Bot", "chatbot");

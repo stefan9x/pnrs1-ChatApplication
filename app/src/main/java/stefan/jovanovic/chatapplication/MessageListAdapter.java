@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class MessageListAdapter extends BaseAdapter {
 
@@ -30,9 +31,7 @@ public class MessageListAdapter extends BaseAdapter {
     public void update(MessageClass[] messages) {
         arlstMessages.clear();
         if (messages != null) {
-            for (MessageClass message : messages) {
-                arlstMessages.add(message);
-            }
+            Collections.addAll(arlstMessages, messages);
         }
         notifyDataSetChanged();
     }
@@ -66,8 +65,8 @@ public class MessageListAdapter extends BaseAdapter {
             view = inflater.inflate(R.layout.layout_message, null);
 
             MessageListAdapter.MessageHolder holder = new MessageListAdapter.MessageHolder();
-            holder.tvMessage = (TextView) view.findViewById(R.id.tv_message);
-            holder.tvTime = (TextView) view.findViewById(R.id.message_time);
+            holder.tvMessage = view.findViewById(R.id.tv_message);
+            holder.tvTime = view.findViewById(R.id.message_time);
 
             view.setTag(holder);
         }

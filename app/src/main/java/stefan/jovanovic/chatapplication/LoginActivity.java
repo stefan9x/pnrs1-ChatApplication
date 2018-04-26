@@ -11,7 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class MainActivity extends Activity implements View.OnClickListener {
+public class LoginActivity extends Activity implements View.OnClickListener {
 
     private EditText etUsername;
     private EditText etPassword;
@@ -93,7 +93,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     public void onClick(View view) {
         //Starting register activity with register button
         if (view.getId() == R.id.btn_register) {
-            Intent RegisterActivity_intent = new Intent(MainActivity.this, RegisterActivity.class);
+            Intent RegisterActivity_intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(RegisterActivity_intent);
         }
 
@@ -103,7 +103,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             if (etUsername.getText().toString().compareTo("chatbot") == 0) {
                 Toast.makeText(this, getText(R.string.error_cannot_login_chatbot), Toast.LENGTH_SHORT).show();
             } else {
-                Intent ContactsActivity_intent = new Intent(MainActivity.this, ContactsActivity.class);
+                Intent ContactsActivity_intent = new Intent(LoginActivity.this, ContactsActivity.class);
 
                 // Shared preferences editor
                 SharedPreferences.Editor editor = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();

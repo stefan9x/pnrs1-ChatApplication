@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="stefan.jovanovic.chatapplication.MainActivity">
+    tools:context="stefan.jovanovic.chatapplication.LoginActivity">
 
     <EditText
         android:layout_width="200dp"

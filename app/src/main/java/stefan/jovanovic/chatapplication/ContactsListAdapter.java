@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -32,9 +33,7 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
     public void update(ContactClass[] contacts) {
         arlstContacts.clear();
         if (contacts != null) {
-            for (ContactClass contact : contacts) {
-                arlstContacts.add(contact);
-            }
+            Collections.addAll(arlstContacts, contacts);
         }
         notifyDataSetChanged();
     }
@@ -74,9 +73,9 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
             view = inflater.inflate(R.layout.layout_contact, null);
 
             ContactHolder holder = new ContactHolder();
-            holder.tvFirstletter = (TextView) view.findViewById(R.id.tv_name_first_letter);
-            holder.tvName = (TextView) view.findViewById(R.id.tv_contact_name);
-            holder.imgbtnSend = (ImageButton) view.findViewById(R.id.imgbtn_send);
+            holder.tvFirstletter = view.findViewById(R.id.tv_name_first_letter);
+            holder.tvName = view.findViewById(R.id.tv_contact_name);
+            holder.imgbtnSend = view.findViewById(R.id.imgbtn_send);
             holder.imgbtnSend.setOnClickListener(this);
             view.setTag(holder);
         }

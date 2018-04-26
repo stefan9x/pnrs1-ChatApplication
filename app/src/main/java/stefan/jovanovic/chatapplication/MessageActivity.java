@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -17,6 +16,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+
+import java.util.Random;
 
 public class MessageActivity extends Activity implements View.OnClickListener, AdapterView.OnItemLongClickListener {
 
@@ -112,7 +113,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
     public void onClick(View view) {
         // Starts main activity if logout button is pressed
         if (view.getId() == R.id.btn_logout_message) {
-            Intent intMainactivity = new Intent(MessageActivity.this, MainActivity.class);
+            Intent intMainactivity = new Intent(MessageActivity.this, LoginActivity.class);
             startActivity(intMainactivity);
         }
 
@@ -153,7 +154,15 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
         } else if (text.toLowerCase().contains("bye")) {
             bot_message = "Bye!";
         } else {
-            bot_message = "Lol, nope " + new String(Character.toChars(0x1F595));
+            Random rnd = new Random();
+            int rndi = rnd.nextInt(3);
+            if (rndi == 0) {
+                bot_message = "Whaat? " + new String(Character.toChars(0x1F928));
+            } else if (rndi == 1) {
+                bot_message = "Lol " + new String(Character.toChars(0x1F914));
+            } else {
+                bot_message = "Please! " + new String(Character.toChars(0x1F621));
+            }
         }
 
         // Send message if bot has an answer

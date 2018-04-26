@@ -31,4 +31,5 @@
     <string name="error_delete_only_your_messages">You can only delete your messages</string>
     <string name="error_cannot_register_chatbot">You can not register as chatbot, its already used by app</string>
     <string name="error_cannot_login_chatbot">You can not login as chatbot, its already used by app</string>
+    <string name="error_bot_respawn">Bot will be spawned again</string>
 </resources>
