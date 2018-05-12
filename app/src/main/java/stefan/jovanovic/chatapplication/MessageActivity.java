@@ -77,12 +77,12 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
         lvMessages = findViewById(R.id.messages_list);
 
         // New chatdbhelper instance
-        chatDbHelper = new ChatDbHelper(this);
+        //chatDbHelper = new ChatDbHelper(this);
 
-        String receiver_user = chatDbHelper.readContact(null, receiver_userid).getsFirstName() +
-                " " + chatDbHelper.readContact(null, receiver_userid).getsLastName();
-        tvContactname.setText(receiver_user);
-        receiver_username = chatDbHelper.readContact(null, receiver_userid).getsUserName();
+        //String receiver_user = chatDbHelper.readContact(null, receiver_userid).getsFirstName() +
+          //      " " + chatDbHelper.readContact(null, receiver_userid).getsLastName();
+        //tvContactname.setText(receiver_user);
+        //receiver_username = chatDbHelper.readContact(null, receiver_userid).getsUserName();
 
         // Setting adapter to list
         lvMessages.setAdapter(messagelistadapter);
@@ -122,7 +122,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
             // Inserting message into database and updating messages list
             MessageClass message = new MessageClass(null, sender_userid, receiver_userid,
                     etMessage.getText().toString());
-            chatDbHelper.insertMessage(message);
+            //chatDbHelper.insertMessage(message);
             updateMessagesList(sender_userid, receiver_userid);
 
             if (receiver_username.compareTo("chatbot") == 0) {
@@ -168,7 +168,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
         // Send message if bot has an answer
         if (bot_message.length() > 0) {
             MessageClass message = new MessageClass(null, receiver_userid, sender_userid, bot_message);
-            chatDbHelper.insertMessage(message);
+            //chatDbHelper.insertMessage(message);
             updateMessagesList(sender_userid, receiver_userid);
         }
     }
@@ -191,7 +191,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
                 public void onClick(DialogInterface dialog, int which) {
 
                     // Deleting message from database
-                    chatDbHelper.deleteMessage(message.getsMessageId());
+                    //chatDbHelper.deleteMessage(message.getsMessageId());
 
                     // Updating messages list
                     updateMessagesList(sender_userid, receiver_userid);
@@ -219,7 +219,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
     // Function for reading messages from database
     // and updating messages list
     public void updateMessagesList(String senderid, String receiverid) {
-        MessageClass[] messages = chatDbHelper.readMessages(senderid, receiverid);
-        messagelistadapter.update(messages);
+       // MessageClass[] messages = chatDbHelper.readMessages(senderid, receiverid);
+       // messagelistadapter.update(messages);
     }
 }

@@ -32,8 +32,15 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
     // Update contacts list
     public void update(ContactClass[] contacts) {
         arlstContacts.clear();
+        SharedPreferences prefs = cContext.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+
+        String loggedin_username = prefs.getString("leggedin_username", null);
+
         if (contacts != null) {
-            Collections.addAll(arlstContacts, contacts);
+            for (ContactClass contact : contacts){
+                if (!contact.getsUserName().equals(loggedin_username))
+                    arlstContacts.add(contact);
+            }
         }
         notifyDataSetChanged();
     }
@@ -88,15 +95,15 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
         int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
 
         // Getting first letter from name
-        holder.tvFirstletter.setText(contactclass.getsFirstName().substring(0, 1).toUpperCase());
+        holder.tvFirstletter.setText(contactclass.getsUserName().substring(0, 1).toUpperCase());
         holder.tvFirstletter.setBackgroundColor(color);
 
         // Setting text to name
-        String name = contactclass.getsFirstName() + " " + contactclass.getsLastName();
+        String name = contactclass.getsUserName();
         holder.tvName.setText(name);
 
         // Setting contact id on button tag
-        holder.imgbtnSend.setTag(contactclass.getsUserId());
+        holder.imgbtnSend.setTag(contactclass.getsUserName());
 
         return view;
     }

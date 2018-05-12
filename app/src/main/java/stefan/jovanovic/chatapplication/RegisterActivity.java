@@ -3,6 +3,7 @@ package stefan.jovanovic.chatapplication;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -11,6 +12,10 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.Date;
 
 
@@ -24,7 +29,13 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
     private Button btnRegister;
     private DatePicker dpDatepicker;
 
-    private ChatDbHelper chatDbHelper;
+    //private ChatDbHelper chatDbHelper;
+
+    private HttpHelper httphelper;
+    private Handler handler;
+
+    private static String BASE_URL = "http://18.205.194.168:80";
+    private static String POST_URL = BASE_URL + "/register";
 
     public TextWatcher twRegister = new TextWatcher() {
 
@@ -127,33 +138,51 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
         btnRegister.setOnClickListener(this);
 
         // New chatdbhelper instance
-        chatDbHelper = new ChatDbHelper(this);
+        //chatDbHelper = new ChatDbHelper(this);
+
+        httphelper = new HttpHelper();
+
+        handler = new Handler();
     }
 
     @Override
     public void onClick(View view) {
 
-        // Starts contacts activity if register button is pressed
-        if (view.getId() == R.id.btn_new_register) {
+    // Starts contacts activity if register button is pressed
+    if (view.getId() == R.id.btn_new_register) {
 
-            // Check if trying to register with username "chatbot"
-            // if yes, show toast, else do login
-            if (etUsername.getText().toString().compareTo("chatbot") == 0) {
-                Toast.makeText(this, getText(R.string.error_cannot_register_chatbot), Toast.LENGTH_SHORT).show();
-            } else {
+        //ContactClass contact = new ContactClass(null, etFirstName.getText().toString(), etLastname.getText().toString(),
+                //etUsername.getText().toString());
+        // chatDbHelper.insertContact(contact);
 
-                // If yes display toast, else create new user in database, and start main activity
-                if (chatDbHelper.searchContactByUsername(etUsername.getText().toString())) {
-                    Toast.makeText(this, getText(R.string.error_user_exist), Toast.LENGTH_SHORT).show();
-                } else {
-                    ContactClass contact = new ContactClass(null, etFirstName.getText().toString(), etLastname.getText().toString(),
-                            etUsername.getText().toString());
-                    chatDbHelper.insertContact(contact);
+        new Thread(new Runnable() {
+            public void run() {
+                JSONObject jsonObject = new JSONObject();
+                try {
+                    jsonObject.put("username", etUsername.getText().toString());
+                    jsonObject.put("password", etPassword.getText().toString());
+                    jsonObject.put("email", etEmail.getText().toString());
 
-                    Intent MainActivity_intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                    startActivity(MainActivity_intent);
+                    final boolean success = httphelper.registerUserOnServer(POST_URL, jsonObject);
+
+                    handler.post(new Runnable(){
+                        public void run() {
+                            if (!success) {
+                                Toast.makeText(RegisterActivity.this, getText(R.string.error_user_exist), Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(RegisterActivity.this, getText(R.string.success_user_register), Toast.LENGTH_SHORT).show();
+                                Intent LoginActivity_intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                                startActivity(LoginActivity_intent);
+                            }
+                        }
+                    });
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
+            }).start();
         }
     }
 }

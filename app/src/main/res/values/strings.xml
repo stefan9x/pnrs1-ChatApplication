@@ -11,6 +11,7 @@
     <string name="accept_notification">Accept Notification</string>
     <string name="birth_date">Birth Date</string>
     <string name="logout">Log out</string>
+    <string name="refresh">Refresh</string>
     <string name="send">Send</string>
     <string name="type_message">Type a message</string>
     <string name="male">Male</string>
@@ -20,9 +21,10 @@
     <string name="error_email">Invalid email</string>
     <string name="message_sent">"Message is sent!"</string>
     <string name="error_username">Type username</string>
-    <string name="logged_in_user">Logged in as: </string>
+    <string name="logged_in_user">User:</string>
     <string name="error_user_not_found">User not found, please register</string>
     <string name="error_user_exist">User already exists</string>
+    <string name="success_user_register">User successfully registred</string>
     <string name="dialog_delete_title">Delete?</string>
     <string name="dialog_delete_contact_confirmation_text">Are you sure you want to delete contact?</string>
     <string name="dialog_delete_message_confirmation_text">Are you sure you want to delete message?</string>
@@ -32,4 +34,5 @@
     <string name="error_cannot_register_chatbot">You can not register as chatbot, its already used by app</string>
     <string name="error_cannot_login_chatbot">You can not login as chatbot, its already used by app</string>
     <string name="error_bot_respawn">Bot will be spawned again</string>
+    <string name="error_cannot_logout">Cannot logout</string>
 </resources>

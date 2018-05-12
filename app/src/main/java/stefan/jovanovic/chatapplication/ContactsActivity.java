@@ -2,10 +2,12 @@ package stefan.jovanovic.chatapplication;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -13,17 +15,32 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+
 public class ContactsActivity extends Activity implements View.OnClickListener, AdapterView.OnItemLongClickListener {
 
     private ListView lvContacts;
     private Button btnLogout;
+    private Button btnRefresh;
     private TextView tvLoggedinas;
 
     private ContactsListAdapter contactslistadapter;
-    private ChatDbHelper chatDbHelper;
+    //private ChatDbHelper chatDbHelper;
 
     private static final String MY_PREFS_NAME = "PrefsFile";
     private String loggedin_userId;
+    private String leggedin_username;
+
+    private HttpHelper httphelper;
+    private Handler handler;
+    private Context contactsActivity;
+    private static String BASE_URL = "http://18.205.194.168:80";
+    private static String CONTACTS_URL = BASE_URL + "/contacts";
+    private static String LOGOUT_URL = BASE_URL + "/logout";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,33 +48,36 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
         setContentView(R.layout.activity_contacts);
 
         // New chatdbhelper instance
-        chatDbHelper = new ChatDbHelper(this);
+        //chatDbHelper = new ChatDbHelper(this);
 
         lvContacts = findViewById(R.id.contacts_list);
         btnLogout = findViewById(R.id.btn_logout);
         tvLoggedinas = findViewById(R.id.logged_user);
+        btnRefresh = findViewById(R.id.btn_refresh);
 
         // Adds logout button listener
         btnLogout.setOnClickListener(this);
+        btnRefresh.setOnClickListener(this);
 
         // Adding contacts to list
         contactslistadapter = new ContactsListAdapter(this);
 
         // Setting adapter to contacts list
         lvContacts.setAdapter(contactslistadapter);
-        lvContacts.setOnItemLongClickListener(this);
+        //lvContacts.setOnItemLongClickListener(this);
+
+        contactsActivity = this;
 
         // Getting logged user userid, from SharedPreference file
         SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
         loggedin_userId = prefs.getString("loggedin_userId", null);
+        leggedin_username = prefs.getString("leggedin_username", null);
 
-        // Searching for logged in user in database,
-        // and setting his username, first and last name to textview
+        tvLoggedinas.setText(leggedin_username);
 
-        String loggedin_user = chatDbHelper.readContact(null, loggedin_userId).getsUserName() +
-                "(" + chatDbHelper.readContact(null, loggedin_userId).getsFirstName() +
-                " " + chatDbHelper.readContact(null, loggedin_userId).getsLastName() + ")";
-        tvLoggedinas.setText(loggedin_user);
+        httphelper = new HttpHelper();
+
+        handler = new Handler();
 
     }
 
@@ -72,9 +92,37 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
     @Override
     public void onClick(View view) {
         // Starts main activity if logout button is pressed
-        if (view.getId() == R.id.btn_logout) {
-            Intent intMainactivity = new Intent(ContactsActivity.this, LoginActivity.class);
-            startActivity(intMainactivity);
+        switch (view.getId()){
+            case R.id.btn_logout:
+
+                new Thread(new Runnable() {
+                    public void run() {
+                        try {
+
+                            final boolean success = httphelper.logOutUserFromServer(contactsActivity, LOGOUT_URL);
+
+                            handler.post(new Runnable(){
+                                public void run() {
+                                    if (!success) {
+                                        Toast.makeText(ContactsActivity.this, getText(R.string.error_cannot_logout), Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Intent intMainactivity = new Intent(ContactsActivity.this, LoginActivity.class);
+                                        startActivity(intMainactivity);
+                                    }
+                                }
+                            });
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+                break;
+
+            case R.id.btn_refresh:
+                updateContactList();
+                break;
         }
     }
 
@@ -99,7 +147,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
             public void onClick(DialogInterface dialog, int which) {
 
                 // Deleting contact on long press
-                chatDbHelper.deleteContact(contact.getsUserId());
+                //chatDbHelper.deleteContact(contact.getsUserId());
 
                 // Updating list
                 updateContactList();
@@ -124,14 +172,36 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
     // Updating contacts list and adding bot to database
     public void updateContactList() {
 
-        ContactClass[] contacts;
+        new Thread(new Runnable() {
+            ContactClass[] contacts_class;
+            public void run() {
+                try {
+                    final JSONArray contacts = httphelper.getContactsFromServer(contactsActivity, CONTACTS_URL);
+                    handler.post(new Runnable(){
+                        public void run() {
+                            if (contacts != null) {
 
-        if (!chatDbHelper.searchContactByUsername("chatbot")) {
-            ContactClass contact = new ContactClass(null, "Chat", "Bot", "chatbot");
-            chatDbHelper.insertContact(contact);
-        }
+                                JSONObject json_contact;
+                                contacts_class = new ContactClass[contacts.length()];
 
-        contacts = chatDbHelper.readContacts(loggedin_userId);
-        contactslistadapter.update(contacts);
+                                for (int i = 0; i < contacts.length(); i++) {
+                                    try {
+                                        json_contact = contacts.getJSONObject(i);
+                                        contacts_class[i] = new ContactClass(json_contact.getString("username"));
+                                    } catch (JSONException e1) {
+                                        e1.printStackTrace();
+                                    }
+                                }
+                                contactslistadapter.update(contacts_class);
+                            }
+                        }
+                    });
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }).start();
     }
 }

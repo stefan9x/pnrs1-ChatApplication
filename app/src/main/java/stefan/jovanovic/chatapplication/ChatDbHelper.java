@@ -52,9 +52,9 @@ public class ChatDbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(COLUMN_CONTACT_ID, contact.getsUserId());
-        values.put(COLUMN_FIRST_NAME, contact.getsFirstName());
-        values.put(COLUMN_LAST_NAME, contact.getsLastName());
+        //values.put(COLUMN_CONTACT_ID, contact.getsUserId());
+        //values.put(COLUMN_FIRST_NAME, contact.getsFirstName());
+        //values.put(COLUMN_LAST_NAME, contact.getsLastName());
         values.put(COLUMN_USERNAME, contact.getsUserName());
 
         db.insert(TABLE_NAME_CONTACTS, null, values);
@@ -63,12 +63,12 @@ public class ChatDbHelper extends SQLiteOpenHelper {
 
     // Create contact class object based on cursor
     private ContactClass createContact(Cursor cursor) {
-        String id = cursor.getString(cursor.getColumnIndex(COLUMN_CONTACT_ID));
-        String firstName = cursor.getString(cursor.getColumnIndex(COLUMN_FIRST_NAME));
-        String lastName = cursor.getString(cursor.getColumnIndex(COLUMN_LAST_NAME));
+        //String id = cursor.getString(cursor.getColumnIndex(COLUMN_CONTACT_ID));
+        //String firstName = cursor.getString(cursor.getColumnIndex(COLUMN_FIRST_NAME));
+        //String lastName = cursor.getString(cursor.getColumnIndex(COLUMN_LAST_NAME));
         String userName = cursor.getString(cursor.getColumnIndex(COLUMN_USERNAME));
 
-        return new ContactClass(id, firstName, lastName, userName);
+        return new ContactClass(userName);
     }
 
     // Read contacts from database
