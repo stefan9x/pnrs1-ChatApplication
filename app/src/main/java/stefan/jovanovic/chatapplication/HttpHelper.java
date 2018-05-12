@@ -181,4 +181,87 @@ public class HttpHelper {
 
         return (responseCode==SUCCESS);
     }
+
+    public boolean sendMessageToServer(Context message_context, String urlString, JSONObject jsonObject) throws IOException, JSONException {
+
+        HttpURLConnection urlConnection;
+        java.net.URL url = new URL(urlString);
+
+        SharedPreferences prefs = message_context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+        String loggedin_userId = prefs.getString("sessionId", null);
+
+        urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setRequestMethod("POST");
+        urlConnection.setRequestProperty("sessionid", loggedin_userId);
+        urlConnection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
+        urlConnection.setRequestProperty("Accept","application/json");
+
+        urlConnection.setReadTimeout(1000 /* milliseconds */ );
+        urlConnection.setConnectTimeout(15000 /* milliseconds */ );
+
+        /*needed when used POST or PUT methods*/
+        urlConnection.setDoOutput(true);
+        urlConnection.setDoInput(true);
+
+        try {
+            urlConnection.connect();
+        } catch (IOException e) {
+            return false;
+        }
+
+        DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
+
+        /*write json object*/
+        os.writeBytes(jsonObject.toString());
+        os.flush();
+        os.close();
+
+        int responseCode =  urlConnection.getResponseCode();
+
+        urlConnection.disconnect();
+
+        return (responseCode==SUCCESS);
+    }
+
+    public JSONArray getMessagesFromServer(Context contacts_context, String urlString) throws IOException, JSONException {
+
+        HttpURLConnection urlConnection;
+        java.net.URL url = new URL(urlString);
+        urlConnection = (HttpURLConnection) url.openConnection();
+
+
+        SharedPreferences prefs = contacts_context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+        String loggedin_userId = prefs.getString("sessionId", null);
+
+        /*header fields*/
+        urlConnection.setRequestMethod("GET");
+        urlConnection.setRequestProperty("sessionid", loggedin_userId);
+        //urlConnection.addRequestProperty("Content-Type", "application/json;charset=UTF-8");
+        urlConnection.setReadTimeout(10000 /* milliseconds */ );
+        urlConnection.setConnectTimeout(15000 /* milliseconds */ );
+
+        try {
+            urlConnection.connect();
+        } catch (IOException e) {
+            return null;
+        }
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+
+        String line;
+        while ((line = br.readLine()) != null) {
+            sb.append(line + "\n");
+        }
+
+        br.close();
+
+        String jsonString = sb.toString();
+
+        int responseCode =  urlConnection.getResponseCode();
+
+        urlConnection.disconnect();
+
+        return responseCode == SUCCESS ? new JSONArray(jsonString) : null;
+    }
 }

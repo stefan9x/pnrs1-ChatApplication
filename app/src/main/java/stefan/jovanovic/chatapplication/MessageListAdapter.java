@@ -82,10 +82,10 @@ public class MessageListAdapter extends BaseAdapter {
 
         // Getting logged in user userid from shared preference file
         SharedPreferences prefs = cContext.getSharedPreferences(MY_PREFS_NAME, cContext.MODE_PRIVATE);
-        String sender_userid = prefs.getString("loggedin_userId", null);
+        String sender_username = prefs.getString("leggedin_username", null);
 
         // Setting text and background colors and gravity based on users
-        if ((messageclass.getsSenderId().compareTo(sender_userid) == 0)) {
+        if ((messageclass.getsSender().compareTo(sender_username) == 0)) {
             holder.tvMessage.setGravity(Gravity.RIGHT | Gravity.CENTER);
             holder.tvMessage.setTextColor(Color.rgb(255, 255, 255));
             holder.tvMessage.setBackgroundColor(Color.argb(50, 173, 173, 173));

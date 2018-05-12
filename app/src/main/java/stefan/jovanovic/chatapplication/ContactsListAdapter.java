@@ -115,7 +115,7 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
 
             // Putting receiver userid into SharedPreference file
             SharedPreferences.Editor editor = cContext.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
-            editor.putString("receiver_userId", view.getTag().toString());
+            editor.putString("receiver_username", view.getTag().toString());
             editor.apply();
 
             // Starting message activity

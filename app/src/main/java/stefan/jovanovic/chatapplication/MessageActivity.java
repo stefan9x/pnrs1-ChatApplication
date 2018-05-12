@@ -2,9 +2,11 @@ package stefan.jovanovic.chatapplication;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -17,6 +19,11 @@ import android.widget.Toast;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.Random;
 
 public class MessageActivity extends Activity implements View.OnClickListener, AdapterView.OnItemLongClickListener {
@@ -30,11 +37,20 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
     private MessageListAdapter messagelistadapter = new MessageListAdapter(this);
 
     private static final String MY_PREFS_NAME = "PrefsFile";
-    private String receiver_userid;
     private String sender_userid;
     private String receiver_username;
 
-    private ChatDbHelper chatDbHelper;
+    private static String BASE_URL = "http://18.205.194.168:80";
+    private static String POST_MESSAGE_URL = BASE_URL + "/message";
+    private static String GET_MESSAGE_URL = BASE_URL + "/message/";
+
+    //private ChatDbHelper chatDbHelper;
+
+    public Context message_context;
+    public MessageClass[] message_class;
+
+    private HttpHelper httphelper;
+    private Handler handler;
 
     private TextWatcher twSend = new TextWatcher() {
 
@@ -67,7 +83,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
 
         // Contact name in upper corner
         SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
-        receiver_userid = prefs.getString("receiver_userId", null);
+        receiver_username = prefs.getString("receiver_username", null);
         sender_userid = prefs.getString("loggedin_userId", null);
 
         btnLogout = findViewById(R.id.btn_logout_message);
@@ -99,6 +115,13 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
         // Adds listeners on logout and send buttons
         btnLogout.setOnClickListener(this);
         btnSend.setOnClickListener(this);
+
+        message_context = this;
+
+        httphelper = new HttpHelper();
+
+        handler = new Handler();
+
     }
 
     @Override
@@ -106,7 +129,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
         super.onResume();
 
         // Update messages list
-        updateMessagesList(sender_userid, receiver_userid);
+        updateMessagesList();
     }
 
     @Override
@@ -119,64 +142,41 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
 
         if (view.getId() == R.id.btn_send) {
 
-            // Inserting message into database and updating messages list
-            MessageClass message = new MessageClass(null, sender_userid, receiver_userid,
-                    etMessage.getText().toString());
-            //chatDbHelper.insertMessage(message);
-            updateMessagesList(sender_userid, receiver_userid);
+            new Thread(new Runnable() {
+                public void run() {
+                    JSONObject jsonObject = new JSONObject();
+                    try {
+                        jsonObject.put("receiver", receiver_username);
+                        jsonObject.put("data", etMessage.getText().toString());
 
-            if (receiver_username.compareTo("chatbot") == 0) {
-                chatBot(etMessage.getText().toString());
-            }
+                        final boolean success = httphelper.sendMessageToServer(message_context, POST_MESSAGE_URL, jsonObject);
 
-            // Shows toast if send button is pressed and clears message field
-            Toast.makeText(this, getText(R.string.message_sent), Toast.LENGTH_SHORT).show();
-            etMessage.getText().clear();
+                        handler.post(new Runnable(){
+                            public void run() {
+                                if (!success) {
+                                    Toast.makeText(message_context, getText(R.string.error_message_not_send), Toast.LENGTH_SHORT).show();
+                                } else {
 
-        }
-    }
-
-    // Simple chat bot
-    public void chatBot(String text) {
-
-        String bot_message;
-
-        if (text.toLowerCase().contains("hello")) {
-            bot_message = "Hey!";
-        } else if (text.toLowerCase().contains("how")) {
-            bot_message = "I'm fine thanks, you?";
-        } else if (text.toLowerCase().contains("what")) {
-            bot_message = "Nothing special.";
-        } else if (text.toLowerCase().contains("yes")) {
-            bot_message = "what yes?";
-        } else if (text.toLowerCase().contains("no")) {
-            bot_message = "what no?";
-        } else if (text.toLowerCase().contains("bye")) {
-            bot_message = "Bye!";
-        } else {
-            Random rnd = new Random();
-            int rndi = rnd.nextInt(3);
-            if (rndi == 0) {
-                bot_message = "Whaat? " + new String(Character.toChars(0x1F928));
-            } else if (rndi == 1) {
-                bot_message = "Lol " + new String(Character.toChars(0x1F914));
-            } else {
-                bot_message = "Please! " + new String(Character.toChars(0x1F621));
-            }
-        }
-
-        // Send message if bot has an answer
-        if (bot_message.length() > 0) {
-            MessageClass message = new MessageClass(null, receiver_userid, sender_userid, bot_message);
-            //chatDbHelper.insertMessage(message);
-            updateMessagesList(sender_userid, receiver_userid);
+                                    Toast.makeText(message_context, getText(R.string.message_sent), Toast.LENGTH_SHORT).show();
+                                    etMessage.getText().clear();
+                                }
+                            }
+                        });
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+            updateMessagesList();
         }
     }
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-        final MessageClass message = (MessageClass) messagelistadapter.getItem(position);
+        /*final MessageClass message = (MessageClass) messagelistadapter.getItem(position);
 
         // Check if user is deleting his messages, if not, show toast
         if (message.getsSenderId().compareTo(sender_userid) == 0) {
@@ -194,7 +194,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
                     //chatDbHelper.deleteMessage(message.getsMessageId());
 
                     // Updating messages list
-                    updateMessagesList(sender_userid, receiver_userid);
+                    //updateMessagesList(sender_userid, receiver_userid);
                 }
             });
 
@@ -213,13 +213,44 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
         } else {
             Toast.makeText(this, getText(R.string.error_delete_only_your_messages), Toast.LENGTH_SHORT).show();
             return false;
-        }
+        }*/
+        return false;
     }
 
-    // Function for reading messages from database
-    // and updating messages list
-    public void updateMessagesList(String senderid, String receiverid) {
-       // MessageClass[] messages = chatDbHelper.readMessages(senderid, receiverid);
-       // messagelistadapter.update(messages);
+    public void updateMessagesList() {
+
+        new Thread(new Runnable() {
+
+            public void run() {
+                try {
+                    final JSONArray messages = httphelper.getMessagesFromServer(message_context, GET_MESSAGE_URL+receiver_username);
+
+                    handler.post(new Runnable(){
+                        public void run() {
+                            if (messages != null) {
+
+                                JSONObject json_message;
+                                message_class = new MessageClass[messages.length()];
+
+                                for (int i = 0; i < messages.length(); i++) {
+                                    try {
+                                        json_message = messages.getJSONObject(i);
+                                        message_class[i] = new MessageClass(json_message.getString("sender"),json_message.getString("data"));
+                                    } catch (JSONException e1) {
+                                        e1.printStackTrace();
+                                    }
+                                }
+                                messagelistadapter.update(message_class);
+                            }
+                        }
+                    });
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }).start();
+
     }
 }

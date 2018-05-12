@@ -35,4 +35,5 @@
     <string name="error_cannot_login_chatbot">You can not login as chatbot, its already used by app</string>
     <string name="error_bot_respawn">Bot will be spawned again</string>
     <string name="error_cannot_logout">Cannot logout</string>
+    <string name="error_message_not_send">Message not send</string>
 </resources>
