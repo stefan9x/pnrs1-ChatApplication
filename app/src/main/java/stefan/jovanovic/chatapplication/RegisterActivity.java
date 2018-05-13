@@ -1,7 +1,9 @@
 package stefan.jovanovic.chatapplication;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -29,13 +31,13 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
     private Button btnRegister;
     private DatePicker dpDatepicker;
 
-    //private ChatDbHelper chatDbHelper;
-
     private HttpHelper httphelper;
     private Handler handler;
 
     private static String BASE_URL = "http://18.205.194.168:80";
-    private static String POST_URL = BASE_URL + "/register";
+    private static String REGISTER_URL = BASE_URL + "/register";
+
+    public static final String MY_PREFS_NAME = "PrefsFile";
 
     public TextWatcher twRegister = new TextWatcher() {
 
@@ -89,7 +91,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
                 bFistName = true;
             } else {
                 // Display error if password is too short
-                etFirstName.setError(getText(R.string.error_username));
+                etFirstName.setError(getText(R.string.error_name));
                 bFistName = false;
             }
 
@@ -97,7 +99,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
                 bLastName = true;
             } else {
                 // Display error if password is too short
-                etLastname.setError(getText(R.string.error_username));
+                etLastname.setError(getText(R.string.error_last_name));
                 bLastName = false;
             }
 
@@ -137,11 +139,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
         // Adds register button listeners
         btnRegister.setOnClickListener(this);
 
-        // New chatdbhelper instance
-        //chatDbHelper = new ChatDbHelper(this);
-
         httphelper = new HttpHelper();
-
         handler = new Handler();
     }
 
@@ -151,10 +149,6 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
     // Starts contacts activity if register button is pressed
     if (view.getId() == R.id.btn_new_register) {
 
-        //ContactClass contact = new ContactClass(null, etFirstName.getText().toString(), etLastname.getText().toString(),
-                //etUsername.getText().toString());
-        // chatDbHelper.insertContact(contact);
-
         new Thread(new Runnable() {
             public void run() {
                 JSONObject jsonObject = new JSONObject();
@@ -163,16 +157,18 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
                     jsonObject.put("password", etPassword.getText().toString());
                     jsonObject.put("email", etEmail.getText().toString());
 
-                    final boolean success = httphelper.registerUserOnServer(POST_URL, jsonObject);
+                    final boolean response = httphelper.registerUserOnServer(RegisterActivity.this, REGISTER_URL, jsonObject);
 
                     handler.post(new Runnable(){
                         public void run() {
-                            if (!success) {
-                                Toast.makeText(RegisterActivity.this, getText(R.string.error_user_exist), Toast.LENGTH_SHORT).show();
-                            } else {
+                            if (response) {
                                 Toast.makeText(RegisterActivity.this, getText(R.string.success_user_register), Toast.LENGTH_SHORT).show();
                                 Intent LoginActivity_intent = new Intent(RegisterActivity.this, LoginActivity.class);
                                 startActivity(LoginActivity_intent);
+                            } else {
+                                SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+                                String err_msg = prefs.getString("register_err_msg", null);
+                                Toast.makeText(RegisterActivity.this, err_msg, Toast.LENGTH_SHORT).show();
                             }
                         }
                     });

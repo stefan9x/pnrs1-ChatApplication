@@ -24,7 +24,7 @@ public class HttpHelper {
     private static final int SUCCESS = 200;
     public static final String MY_PREFS_NAME = "PrefsFile";
 
-    public boolean registerUserOnServer(String urlString, JSONObject jsonObject) throws IOException, JSONException {
+    public boolean registerUserOnServer(Context context, String urlString, JSONObject jsonObject) throws IOException{
 
         HttpURLConnection urlConnection;
         java.net.URL url = new URL(urlString);
@@ -53,14 +53,23 @@ public class HttpHelper {
         os.writeBytes(jsonObject.toString());
         os.flush();
         os.close();
+
         int responseCode =  urlConnection.getResponseCode();
+
+
+        if(responseCode!=SUCCESS) {
+            SharedPreferences.Editor editor = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
+            String err_msg = urlConnection.getResponseMessage();
+            editor.putString("register_err_msg", err_msg);
+            editor.apply();
+        }
 
         urlConnection.disconnect();
 
         return (responseCode==SUCCESS);
     }
 
-    public boolean logInUserOnServer(Context login_context, String urlString, JSONObject jsonObject) throws IOException, JSONException {
+    public boolean logInUserOnServer(Context context, String urlString, JSONObject jsonObject) throws IOException{
 
         HttpURLConnection urlConnection;
         java.net.URL url = new URL(urlString);
@@ -94,29 +103,29 @@ public class HttpHelper {
 
         String sessionid = urlConnection.getHeaderField("sessionid");
 
-        urlConnection.disconnect();
+        SharedPreferences.Editor editor = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
 
         if(responseCode==SUCCESS) {
-            SharedPreferences.Editor editor = login_context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
             editor.putString("sessionId", sessionid);
             editor.apply();
-        } /*else {
-            SharedPreferences.Editor editor = login_context.getSharedPreferences(MY_PREFS_NAME, login_context.MODE_PRIVATE).edit();
-            editor.putString("error_msg", str_err);
+        } else {
+            String err_msg = urlConnection.getResponseMessage();
+            editor.putString("login_err_msg", err_msg);
             editor.apply();
-        }*/
+        }
 
+        urlConnection.disconnect();
         return (responseCode==SUCCESS);
     }
 
-    public JSONArray getContactsFromServer(Context contacts_context, String urlString) throws IOException, JSONException {
+    public JSONArray getContactsFromServer(Context context, String urlString) throws IOException, JSONException {
 
         HttpURLConnection urlConnection;
         java.net.URL url = new URL(urlString);
         urlConnection = (HttpURLConnection) url.openConnection();
 
 
-        SharedPreferences prefs = contacts_context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
         String loggedin_userId = prefs.getString("sessionId", null);
 
         /*header fields*/

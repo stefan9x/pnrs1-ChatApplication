@@ -37,7 +37,6 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
     private HttpHelper httphelper;
     private Handler handler;
-    private Context contactsActivity;
     private static String BASE_URL = "http://18.205.194.168:80";
     private static String CONTACTS_URL = BASE_URL + "/contacts";
     private static String LOGOUT_URL = BASE_URL + "/logout";
@@ -65,8 +64,6 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
         // Setting adapter to contacts list
         lvContacts.setAdapter(contactslistadapter);
         //lvContacts.setOnItemLongClickListener(this);
-
-        contactsActivity = this;
 
         // Getting logged user userid, from SharedPreference file
         SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
@@ -99,7 +96,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
                     public void run() {
                         try {
 
-                            final boolean success = httphelper.logOutUserFromServer(contactsActivity, LOGOUT_URL);
+                            final boolean success = httphelper.logOutUserFromServer(ContactsActivity.this, LOGOUT_URL);
 
                             handler.post(new Runnable(){
                                 public void run() {
@@ -128,7 +125,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
     @Override
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
-
+/*
         final int deletePos = position;
 
         final ContactClass contact = (ContactClass) contactslistadapter.getItem(deletePos);
@@ -165,8 +162,8 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
         });
 
         alert.show();
-
-        return true;
+*/
+        return false;
     }
 
     // Updating contacts list and adding bot to database
@@ -176,7 +173,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
             ContactClass[] contacts_class;
             public void run() {
                 try {
-                    final JSONArray contacts = httphelper.getContactsFromServer(contactsActivity, CONTACTS_URL);
+                    final JSONArray contacts = httphelper.getContactsFromServer(ContactsActivity.this, CONTACTS_URL);
                     handler.post(new Runnable(){
                         public void run() {
                             if (contacts != null) {

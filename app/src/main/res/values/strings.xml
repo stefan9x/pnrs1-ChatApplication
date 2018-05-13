@@ -21,6 +21,8 @@
     <string name="error_email">Invalid email</string>
     <string name="message_sent">"Message is sent!"</string>
     <string name="error_username">Type username</string>
+    <string name="error_name">Type First name</string>
+    <string name="error_last_name">Type Last name</string>
     <string name="logged_in_user">User:</string>
     <string name="error_user_not_found">User not found, please register</string>
     <string name="error_user_exist">User already exists</string>

@@ -29,13 +29,14 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     //private ChatDbHelper chatDbHelper;
 
     public static final String MY_PREFS_NAME = "PrefsFile";
-    public Context login_context;
+
+    private Context context;
 
     private HttpHelper httphelper;
     private Handler handler;
 
     private static String BASE_URL = "http://18.205.194.168:80";
-    private static String POST_URL = BASE_URL + "/login";
+    private static String LOGIN_URL = BASE_URL + "/login";
 
     public TextWatcher twLogin = new TextWatcher() {
 
@@ -100,56 +101,58 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         // Disables login button on activity create
         btnLogin.setEnabled(false);
 
-        //chatDbHelper = new ChatDbHelper(this);
+        context = this;
 
-        login_context = this;
-
+        // Initialization
         httphelper = new HttpHelper();
-
         handler = new Handler();
     }
 
     @Override
     public void onClick(View view) {
         //Starting register activity with register button
-        if (view.getId() == R.id.btn_register) {
-            Intent RegisterActivity_intent = new Intent(LoginActivity.this, RegisterActivity.class);
-            startActivity(RegisterActivity_intent);
-        }
+        switch (view.getId()){
+            // Starting register activity
+            case R.id.btn_register:
+                Intent RegisterActivity_intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                startActivity(RegisterActivity_intent);
+                break;
 
-        //Starting contacts activity with login button
-        if (view.getId() == R.id.btn_login) {
+            // Logining in on server
+            case R.id.btn_login:
+                new Thread(new Runnable() {
+                    public void run() {
+                        JSONObject jsonObject = new JSONObject();
+                        try {
+                            jsonObject.put("username", etUsername.getText().toString());
+                            jsonObject.put("password", etPassword.getText().toString());
 
-            new Thread(new Runnable() {
-                public void run() {
-                    JSONObject jsonObject = new JSONObject();
-                    try {
-                        jsonObject.put("username", etUsername.getText().toString());
-                        jsonObject.put("password", etPassword.getText().toString());
+                            final boolean response = httphelper.logInUserOnServer(context, LOGIN_URL, jsonObject);
 
-                        final boolean success = httphelper.logInUserOnServer(login_context, POST_URL, jsonObject);
+                            handler.post(new Runnable(){
+                                public void run() {
+                                    if (response) {
+                                        SharedPreferences.Editor editor = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
+                                        editor.putString("leggedin_username", etUsername.getText().toString());
+                                        editor.apply();
 
-                        handler.post(new Runnable(){
-                            public void run() {
-                                if (!success) {
-                                    Toast.makeText(LoginActivity.this, getText(R.string.error_user_not_found), Toast.LENGTH_SHORT).show();
-                                } else {
-                                    SharedPreferences.Editor editor = login_context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
-                                    editor.putString("leggedin_username", etUsername.getText().toString());
-                                    editor.apply();
-
-                                    Intent LoginActivity_intent = new Intent(LoginActivity.this, ContactsActivity.class);
-                                    startActivity(LoginActivity_intent);
+                                        Intent LoginActivity_intent = new Intent(LoginActivity.this, ContactsActivity.class);
+                                        startActivity(LoginActivity_intent);
+                                    } else {
+                                        SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+                                        String err_msg = prefs.getString("login_err_msg", null);
+                                        Toast.makeText(LoginActivity.this, err_msg, Toast.LENGTH_SHORT).show();
+                                    }
                                 }
-                            }
-                        });
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                            });
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
-            }).start();
+                }).start();
+                break;
         }
     }
 
