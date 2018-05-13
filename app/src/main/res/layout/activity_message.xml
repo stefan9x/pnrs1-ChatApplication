@@ -15,11 +15,29 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/tv_message_contact_name"
+            android:id="@+id/chatting_text"
             android:layout_alignParentLeft="true"
             android:layout_centerInParent="true"
             android:textStyle="bold"
-            android:textSize="20sp"/>
+            android:textSize="15sp"
+            android:text="@string/chatting_with_text"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/chatting_with"
+            android:paddingLeft="3dp"
+            android:layout_toRightOf="@+id/chatting_text"
+            android:layout_centerInParent="true"
+            android:textStyle="bold"
+            android:textSize="15sp"/>
+
+        <Button
+            android:id="@+id/btn_refresh_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/btn_logout_message"
+            android:text="@string/refresh"/>
 
         <Button
             android:id="@+id/btn_logout_message"

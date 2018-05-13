@@ -18,7 +18,7 @@
             android:layout_centerInParent="true"
             android:textSize="15sp"
             android:textStyle="bold"
-            android:id="@+id/logged_in_as_text"
+            android:id="@+id/user_text"
             android:text="@string/logged_in_user"/>
 
         <TextView
@@ -28,7 +28,7 @@
             android:textSize="15sp"
             android:textStyle="bold"
             android:paddingLeft="3dp"
-            android:layout_toRightOf="@+id/logged_in_as_text"
+            android:layout_toRightOf="@+id/user_text"
             android:layout_centerInParent="true"/>
 
         <Button

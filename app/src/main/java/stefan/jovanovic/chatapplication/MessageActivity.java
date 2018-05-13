@@ -30,6 +30,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
 
     private Button btnLogout;
     private Button btnSend;
+    private Button btnRefresh;
     private EditText etMessage;
     private TextView tvContactname;
     private ListView lvMessages;
@@ -37,12 +38,12 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
     private MessageListAdapter messagelistadapter = new MessageListAdapter(this);
 
     private static final String MY_PREFS_NAME = "PrefsFile";
-    private String sender_userid;
     private String receiver_username;
 
     private static String BASE_URL = "http://18.205.194.168:80";
     private static String POST_MESSAGE_URL = BASE_URL + "/message";
     private static String GET_MESSAGE_URL = BASE_URL + "/message/";
+    private static String LOGOUT_URL = BASE_URL + "/logout";
 
     //private ChatDbHelper chatDbHelper;
 
@@ -84,21 +85,15 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
         // Contact name in upper corner
         SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
         receiver_username = prefs.getString("receiver_username", null);
-        sender_userid = prefs.getString("loggedin_userId", null);
 
         btnLogout = findViewById(R.id.btn_logout_message);
         btnSend = findViewById(R.id.btn_send);
+        btnRefresh = findViewById(R.id.btn_refresh_message);
         etMessage = findViewById(R.id.et_message);
-        tvContactname = findViewById(R.id.tv_message_contact_name);
+        tvContactname = findViewById(R.id.chatting_with);
         lvMessages = findViewById(R.id.messages_list);
 
-        // New chatdbhelper instance
-        //chatDbHelper = new ChatDbHelper(this);
-
-        //String receiver_user = chatDbHelper.readContact(null, receiver_userid).getsFirstName() +
-          //      " " + chatDbHelper.readContact(null, receiver_userid).getsLastName();
-        //tvContactname.setText(receiver_user);
-        //receiver_username = chatDbHelper.readContact(null, receiver_userid).getsUserName();
+        tvContactname.setText(receiver_username);
 
         // Setting adapter to list
         lvMessages.setAdapter(messagelistadapter);
@@ -115,6 +110,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
         // Adds listeners on logout and send buttons
         btnLogout.setOnClickListener(this);
         btnSend.setOnClickListener(this);
+        btnRefresh.setOnClickListener(this);
 
         message_context = this;
 
@@ -134,42 +130,65 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
 
     @Override
     public void onClick(View view) {
-        // Starts main activity if logout button is pressed
-        if (view.getId() == R.id.btn_logout_message) {
-            Intent intMainactivity = new Intent(MessageActivity.this, LoginActivity.class);
-            startActivity(intMainactivity);
-        }
 
-        if (view.getId() == R.id.btn_send) {
-
-            new Thread(new Runnable() {
-                public void run() {
-                    JSONObject jsonObject = new JSONObject();
-                    try {
-                        jsonObject.put("receiver", receiver_username);
-                        jsonObject.put("data", etMessage.getText().toString());
-
-                        final boolean success = httphelper.sendMessageToServer(message_context, POST_MESSAGE_URL, jsonObject);
-
-                        handler.post(new Runnable(){
-                            public void run() {
-                                if (!success) {
-                                    Toast.makeText(message_context, getText(R.string.error_message_not_send), Toast.LENGTH_SHORT).show();
-                                } else {
-
-                                    Toast.makeText(message_context, getText(R.string.message_sent), Toast.LENGTH_SHORT).show();
-                                    etMessage.getText().clear();
+        switch (view.getId()){
+            case R.id.btn_logout_message:
+                new Thread(new Runnable() {
+                    public void run() {
+                        try {
+                            final boolean success = httphelper.logOutUserFromServer(MessageActivity.this, LOGOUT_URL);
+                            handler.post(new Runnable(){
+                                public void run() {
+                                    if (!success) {
+                                        Toast.makeText(MessageActivity.this, getText(R.string.error_cannot_logout), Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Intent intMainactivity = new Intent(MessageActivity.this, LoginActivity.class);
+                                        startActivity(intMainactivity);
+                                    }
                                 }
-                            }
-                        });
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                            });
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
-            }).start();
-            updateMessagesList();
+                }).start();
+                break;
+
+            case R.id.btn_refresh_message:
+                updateMessagesList();
+                break;
+
+            case R.id.btn_send:
+                new Thread(new Runnable() {
+                    public void run() {
+                        JSONObject jsonObject = new JSONObject();
+                        try {
+                            jsonObject.put("receiver", receiver_username);
+                            jsonObject.put("data", etMessage.getText().toString());
+                            final boolean success = httphelper.sendMessageToServer(message_context, POST_MESSAGE_URL, jsonObject);
+                            handler.post(new Runnable(){
+                                public void run() {
+                                    if (!success) {
+                                        Toast.makeText(message_context, getText(R.string.error_message_not_send), Toast.LENGTH_SHORT).show();
+                                    } else {
+
+                                        Toast.makeText(message_context, getText(R.string.message_sent), Toast.LENGTH_SHORT).show();
+                                        etMessage.getText().clear();
+                                    }
+                                    updateMessagesList();
+                                }
+                            });
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+
+                break;
         }
     }
 
@@ -218,7 +237,6 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
     }
 
     public void updateMessagesList() {
-
         new Thread(new Runnable() {
 
             public void run() {
@@ -251,6 +269,5 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
                 }
             }
         }).start();
-
     }
 }

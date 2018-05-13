@@ -133,7 +133,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                                 public void run() {
                                     if (response) {
                                         SharedPreferences.Editor editor = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
-                                        editor.putString("leggedin_username", etUsername.getText().toString());
+                                        editor.putString("loggedin_username", etUsername.getText().toString());
                                         editor.apply();
 
                                         Intent LoginActivity_intent = new Intent(LoginActivity.this, ContactsActivity.class);

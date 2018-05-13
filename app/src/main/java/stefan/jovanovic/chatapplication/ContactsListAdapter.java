@@ -34,7 +34,7 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
         arlstContacts.clear();
         SharedPreferences prefs = cContext.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
 
-        String loggedin_username = prefs.getString("leggedin_username", null);
+        String loggedin_username = prefs.getString("loggedin_username", null);
 
         if (contacts != null) {
             for (ContactClass contact : contacts){

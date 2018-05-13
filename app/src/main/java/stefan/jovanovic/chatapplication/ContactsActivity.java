@@ -32,8 +32,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
     //private ChatDbHelper chatDbHelper;
 
     private static final String MY_PREFS_NAME = "PrefsFile";
-    private String loggedin_userId;
-    private String leggedin_username;
+    private String loggedin_username;
 
     private HttpHelper httphelper;
     private Handler handler;
@@ -67,10 +66,9 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
         // Getting logged user userid, from SharedPreference file
         SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
-        loggedin_userId = prefs.getString("loggedin_userId", null);
-        leggedin_username = prefs.getString("leggedin_username", null);
+        loggedin_username = prefs.getString("loggedin_username", null);
 
-        tvLoggedinas.setText(leggedin_username);
+        tvLoggedinas.setText(loggedin_username);
 
         httphelper = new HttpHelper();
 

@@ -82,7 +82,7 @@ public class MessageListAdapter extends BaseAdapter {
 
         // Getting logged in user userid from shared preference file
         SharedPreferences prefs = cContext.getSharedPreferences(MY_PREFS_NAME, cContext.MODE_PRIVATE);
-        String sender_username = prefs.getString("leggedin_username", null);
+        String sender_username = prefs.getString("loggedin_username", null);
 
         // Setting text and background colors and gravity based on users
         if ((messageclass.getsSender().compareTo(sender_username) == 0)) {
