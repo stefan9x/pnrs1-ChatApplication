@@ -35,20 +35,17 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
     private TextView tvContactname;
     private ListView lvMessages;
 
-    private MessageListAdapter messagelistadapter = new MessageListAdapter(this);
+    private MessageListAdapter messageListAdapter = new MessageListAdapter(this);
 
     private static final String MY_PREFS_NAME = "PrefsFile";
-    private String receiver_username;
+    private String receiverUsername;
 
     private static String BASE_URL = "http://18.205.194.168:80";
     private static String POST_MESSAGE_URL = BASE_URL + "/message";
     private static String GET_MESSAGE_URL = BASE_URL + "/message/";
     private static String LOGOUT_URL = BASE_URL + "/logout";
 
-    //private ChatDbHelper chatDbHelper;
-
-    public Context message_context;
-    public MessageClass[] message_class;
+    public MessageClass[] messageClass;
 
     private HttpHelper httphelper;
     private Handler handler;
@@ -84,7 +81,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
 
         // Contact name in upper corner
         SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
-        receiver_username = prefs.getString("receiver_username", null);
+        receiverUsername = prefs.getString("receiverUsername", null);
 
         btnLogout = findViewById(R.id.btn_logout_message);
         btnSend = findViewById(R.id.btn_send);
@@ -93,13 +90,13 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
         tvContactname = findViewById(R.id.chatting_with);
         lvMessages = findViewById(R.id.messages_list);
 
-        tvContactname.setText(receiver_username);
+        tvContactname.setText(receiverUsername);
 
         // Setting adapter to list
-        lvMessages.setAdapter(messagelistadapter);
+        lvMessages.setAdapter(messageListAdapter);
 
         // On item long click listener
-        lvMessages.setOnItemLongClickListener(this);
+        //lvMessages.setOnItemLongClickListener(this);
 
         // Disables send button on message activity create
         btnSend.setEnabled(false);
@@ -111,8 +108,6 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
         btnLogout.setOnClickListener(this);
         btnSend.setOnClickListener(this);
         btnRefresh.setOnClickListener(this);
-
-        message_context = this;
 
         httphelper = new HttpHelper();
 
@@ -136,14 +131,15 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
                 new Thread(new Runnable() {
                     public void run() {
                         try {
-                            final boolean success = httphelper.logOutUserFromServer(MessageActivity.this, LOGOUT_URL);
+                            final boolean response = httphelper.logOutUserFromServer(MessageActivity.this, LOGOUT_URL);
                             handler.post(new Runnable(){
                                 public void run() {
-                                    if (!success) {
-                                        Toast.makeText(MessageActivity.this, getText(R.string.error_cannot_logout), Toast.LENGTH_SHORT).show();
+                                    if (response) {
+                                        startActivity(new Intent(MessageActivity.this, LoginActivity.class));
                                     } else {
-                                        Intent intMainactivity = new Intent(MessageActivity.this, LoginActivity.class);
-                                        startActivity(intMainactivity);
+                                        SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+                                        String logoutErr = prefs.getString("logoutErr", null);
+                                        Toast.makeText(MessageActivity.this, logoutErr, Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
@@ -165,19 +161,22 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
                     public void run() {
                         JSONObject jsonObject = new JSONObject();
                         try {
-                            jsonObject.put("receiver", receiver_username);
+                            jsonObject.put("receiver", receiverUsername);
                             jsonObject.put("data", etMessage.getText().toString());
-                            final boolean success = httphelper.sendMessageToServer(message_context, POST_MESSAGE_URL, jsonObject);
+
+                            final boolean success = httphelper.sendMessageToServer(MessageActivity.this, POST_MESSAGE_URL, jsonObject);
+
                             handler.post(new Runnable(){
                                 public void run() {
-                                    if (!success) {
-                                        Toast.makeText(message_context, getText(R.string.error_message_not_send), Toast.LENGTH_SHORT).show();
-                                    } else {
-
-                                        Toast.makeText(message_context, getText(R.string.message_sent), Toast.LENGTH_SHORT).show();
+                                    if (success) {
+                                        Toast.makeText(MessageActivity.this, getText(R.string.message_sent), Toast.LENGTH_SHORT).show();
                                         etMessage.getText().clear();
+                                        updateMessagesList();
+                                    } else {
+                                        SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+                                        String sendMsgErr = prefs.getString("sendMsgErr", null);
+                                        Toast.makeText(MessageActivity.this, sendMsgErr, Toast.LENGTH_SHORT).show();
                                     }
-                                    updateMessagesList();
                                 }
                             });
                         } catch (JSONException e) {
@@ -190,6 +189,45 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
 
                 break;
         }
+    }
+
+    public void updateMessagesList() {
+        new Thread(new Runnable() {
+
+            public void run() {
+                try {
+                    final JSONArray messages = httphelper.getMessagesFromServer(MessageActivity.this, GET_MESSAGE_URL+receiverUsername);
+
+                    handler.post(new Runnable(){
+                        public void run() {
+                            if (messages != null) {
+
+                                JSONObject json_message;
+                                messageClass = new MessageClass[messages.length()];
+
+                                for (int i = 0; i < messages.length(); i++) {
+                                    try {
+                                        json_message = messages.getJSONObject(i);
+                                        messageClass[i] = new MessageClass(json_message.getString("sender"),json_message.getString("data"));
+                                    } catch (JSONException e1) {
+                                        e1.printStackTrace();
+                                    }
+                                }
+                                messageListAdapter.update(messageClass);
+                            } else {
+                                SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+                                String getMessagesErr = prefs.getString("getMessagesErr", null);
+                                Toast.makeText(MessageActivity.this, getMessagesErr, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     @Override
@@ -234,40 +272,5 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
             return false;
         }*/
         return false;
-    }
-
-    public void updateMessagesList() {
-        new Thread(new Runnable() {
-
-            public void run() {
-                try {
-                    final JSONArray messages = httphelper.getMessagesFromServer(message_context, GET_MESSAGE_URL+receiver_username);
-
-                    handler.post(new Runnable(){
-                        public void run() {
-                            if (messages != null) {
-
-                                JSONObject json_message;
-                                message_class = new MessageClass[messages.length()];
-
-                                for (int i = 0; i < messages.length(); i++) {
-                                    try {
-                                        json_message = messages.getJSONObject(i);
-                                        message_class[i] = new MessageClass(json_message.getString("sender"),json_message.getString("data"));
-                                    } catch (JSONException e1) {
-                                        e1.printStackTrace();
-                                    }
-                                }
-                                messagelistadapter.update(message_class);
-                            }
-                        }
-                    });
-                } catch (JSONException e1) {
-                    e1.printStackTrace();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        }).start();
     }
 }

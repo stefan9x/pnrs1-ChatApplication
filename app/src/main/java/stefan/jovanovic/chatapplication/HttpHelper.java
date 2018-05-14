@@ -59,8 +59,9 @@ public class HttpHelper {
 
         if(responseCode!=SUCCESS) {
             SharedPreferences.Editor editor = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
-            String err_msg = urlConnection.getResponseMessage();
-            editor.putString("register_err_msg", err_msg);
+            String responseMsg = urlConnection.getResponseMessage();
+            String registerErr = Integer.toString(responseCode) + " : " + responseMsg;
+            editor.putString("registerErr", registerErr);
             editor.apply();
         }
 
@@ -101,16 +102,17 @@ public class HttpHelper {
 
         int responseCode =  urlConnection.getResponseCode();
 
-        String sessionid = urlConnection.getHeaderField("sessionid");
+        String sessionId = urlConnection.getHeaderField("sessionid");
 
         SharedPreferences.Editor editor = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
 
         if(responseCode==SUCCESS) {
-            editor.putString("sessionId", sessionid);
+            editor.putString("sessionId", sessionId);
             editor.apply();
         } else {
-            String err_msg = urlConnection.getResponseMessage();
-            editor.putString("login_err_msg", err_msg);
+            String responseMsg = urlConnection.getResponseMessage();
+            String loginErr = Integer.toString(responseCode) + " : " + responseMsg;
+            editor.putString("loginErr", loginErr);
             editor.apply();
         }
 
@@ -126,11 +128,11 @@ public class HttpHelper {
 
 
         SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
-        String loggedin_userId = prefs.getString("sessionId", null);
+        String sessionId = prefs.getString("sessionId", null);
 
         /*header fields*/
         urlConnection.setRequestMethod("GET");
-        urlConnection.setRequestProperty("sessionid", loggedin_userId);
+        urlConnection.setRequestProperty("sessionid", sessionId);
         //urlConnection.addRequestProperty("Content-Type", "application/json;charset=UTF-8");
         urlConnection.setReadTimeout(10000 /* milliseconds */ );
         urlConnection.setConnectTimeout(15000 /* milliseconds */ );
@@ -154,23 +156,34 @@ public class HttpHelper {
         String jsonString = sb.toString();
 
         int responseCode =  urlConnection.getResponseCode();
+        String responseMsg = urlConnection.getResponseMessage();
+
+        SharedPreferences.Editor editor = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
 
         urlConnection.disconnect();
 
-        return responseCode == SUCCESS ? new JSONArray(jsonString) : null;
+        if (responseCode == SUCCESS){
+            return new JSONArray(jsonString);
+        } else {
+            String getContactsErr = Integer.toString(responseCode) + " : " + responseMsg;
+            editor.putString("getContactsErr", getContactsErr);
+            editor.apply();
+            return null;
+        }
+
     }
 
-    public boolean logOutUserFromServer(Context contacts_context, String urlString) throws IOException, JSONException {
+    public boolean logOutUserFromServer(Context context, String urlString) throws IOException, JSONException {
 
         HttpURLConnection urlConnection;
         java.net.URL url = new URL(urlString);
 
-        SharedPreferences prefs = contacts_context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
-        String loggedin_userId = prefs.getString("sessionId", null);
+        SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+        String sessionId = prefs.getString("sessionId", null);
 
         urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setRequestMethod("POST");
-        urlConnection.setRequestProperty("sessionid", loggedin_userId);
+        urlConnection.setRequestProperty("sessionid", sessionId);
         urlConnection.setReadTimeout(1000 /* milliseconds */ );
         urlConnection.setConnectTimeout(15000 /* milliseconds */ );
 
@@ -186,22 +199,30 @@ public class HttpHelper {
 
         int responseCode =  urlConnection.getResponseCode();
 
-        urlConnection.disconnect();
+        SharedPreferences.Editor editor = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
 
+        if(responseCode!=SUCCESS) {
+            String responseMsg = urlConnection.getResponseMessage();
+            String logoutErr = Integer.toString(responseCode) + " : " + responseMsg;
+            editor.putString("logoutErr", logoutErr);
+            editor.apply();
+        }
+
+        urlConnection.disconnect();
         return (responseCode==SUCCESS);
     }
 
-    public boolean sendMessageToServer(Context message_context, String urlString, JSONObject jsonObject) throws IOException, JSONException {
+    public boolean sendMessageToServer(Context context, String urlString, JSONObject jsonObject) throws IOException, JSONException {
 
         HttpURLConnection urlConnection;
         java.net.URL url = new URL(urlString);
 
-        SharedPreferences prefs = message_context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
-        String loggedin_userId = prefs.getString("sessionId", null);
+        SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+        String sessionId = prefs.getString("sessionId", null);
 
         urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setRequestMethod("POST");
-        urlConnection.setRequestProperty("sessionid", loggedin_userId);
+        urlConnection.setRequestProperty("sessionid", sessionId);
         urlConnection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
         urlConnection.setRequestProperty("Accept","application/json");
 
@@ -227,25 +248,32 @@ public class HttpHelper {
 
         int responseCode =  urlConnection.getResponseCode();
 
-        urlConnection.disconnect();
+        SharedPreferences.Editor editor = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
 
+        if(responseCode!=SUCCESS) {
+            String responseMsg = urlConnection.getResponseMessage();
+            String sendMsgErr = Integer.toString(responseCode) + " : " + responseMsg;
+            editor.putString("sendMsgErr", sendMsgErr);
+            editor.apply();
+        }
+
+        urlConnection.disconnect();
         return (responseCode==SUCCESS);
     }
 
-    public JSONArray getMessagesFromServer(Context contacts_context, String urlString) throws IOException, JSONException {
+    public JSONArray getMessagesFromServer(Context context, String urlString) throws IOException, JSONException {
 
         HttpURLConnection urlConnection;
         java.net.URL url = new URL(urlString);
         urlConnection = (HttpURLConnection) url.openConnection();
 
 
-        SharedPreferences prefs = contacts_context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
-        String loggedin_userId = prefs.getString("sessionId", null);
+        SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+        String sessionId = prefs.getString("sessionId", null);
 
         /*header fields*/
         urlConnection.setRequestMethod("GET");
-        urlConnection.setRequestProperty("sessionid", loggedin_userId);
-        //urlConnection.addRequestProperty("Content-Type", "application/json;charset=UTF-8");
+        urlConnection.setRequestProperty("sessionid", sessionId);
         urlConnection.setReadTimeout(10000 /* milliseconds */ );
         urlConnection.setConnectTimeout(15000 /* milliseconds */ );
 
@@ -268,9 +296,19 @@ public class HttpHelper {
         String jsonString = sb.toString();
 
         int responseCode =  urlConnection.getResponseCode();
+        String responseMsg = urlConnection.getResponseMessage();
+
+        SharedPreferences.Editor editor = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
 
         urlConnection.disconnect();
 
-        return responseCode == SUCCESS ? new JSONArray(jsonString) : null;
+        if (responseCode == SUCCESS){
+            return new JSONArray(jsonString);
+        } else {
+            String getMessagesErr = Integer.toString(responseCode) + " : " + responseMsg;
+            editor.putString("getMessagesErr", getMessagesErr);
+            editor.apply();
+            return null;
+        }
     }
 }

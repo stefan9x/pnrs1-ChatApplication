@@ -20,26 +20,26 @@ import static android.content.Context.MODE_PRIVATE;
 public class ContactsListAdapter extends BaseAdapter implements View.OnClickListener {
 
     private Context cContext;
-    private ArrayList<ContactClass> arlstContacts;
+    private ArrayList<ContactClass> arLstContacts;
 
     public static final String MY_PREFS_NAME = "PrefsFile";
 
     public ContactsListAdapter(Context context) {
         cContext = context;
-        arlstContacts = new ArrayList<ContactClass>();
+        arLstContacts = new ArrayList<ContactClass>();
     }
 
     // Update contacts list
     public void update(ContactClass[] contacts) {
-        arlstContacts.clear();
+        arLstContacts.clear();
         SharedPreferences prefs = cContext.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
 
-        String loggedin_username = prefs.getString("loggedin_username", null);
+        String loggedinUsername = prefs.getString("loggedinUsername", null);
 
         if (contacts != null) {
             for (ContactClass contact : contacts){
-                if (!contact.getsUserName().equals(loggedin_username))
-                    arlstContacts.add(contact);
+                if (!contact.getsUserName().equals(loggedinUsername))
+                    arLstContacts.add(contact);
             }
         }
         notifyDataSetChanged();
@@ -47,20 +47,20 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
 
     // Remove contact from list
     public void removecontact(int position) {
-        arlstContacts.remove(position);
+        arLstContacts.remove(position);
         notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return arlstContacts.size();
+        return arLstContacts.size();
     }
 
     @Override
     public Object getItem(int position) {
         Object contact = null;
         try {
-            contact = arlstContacts.get(position);
+            contact = arLstContacts.get(position);
         } catch (IndexOutOfBoundsException e) {
             e.printStackTrace();
         }
@@ -82,8 +82,8 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
             ContactHolder holder = new ContactHolder();
             holder.tvFirstletter = view.findViewById(R.id.tv_name_first_letter);
             holder.tvName = view.findViewById(R.id.tv_contact_name);
-            holder.imgbtnSend = view.findViewById(R.id.imgbtn_send);
-            holder.imgbtnSend.setOnClickListener(this);
+            holder.imgBtnSend = view.findViewById(R.id.imgbtn_send);
+            holder.imgBtnSend.setOnClickListener(this);
             view.setTag(holder);
         }
 
@@ -103,7 +103,7 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
         holder.tvName.setText(name);
 
         // Setting contact id on button tag
-        holder.imgbtnSend.setTag(contactclass.getsUserName());
+        holder.imgBtnSend.setTag(contactclass.getsUserName());
 
         return view;
     }
@@ -111,21 +111,20 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.imgbtn_send) {
-            Intent intMessageactivity = new Intent(cContext.getApplicationContext(), MessageActivity.class);
 
             // Putting receiver userid into SharedPreference file
             SharedPreferences.Editor editor = cContext.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
-            editor.putString("receiver_username", view.getTag().toString());
+            editor.putString("receiverUsername", view.getTag().toString());
             editor.apply();
 
             // Starting message activity
-            cContext.startActivity(intMessageactivity);
+            cContext.startActivity(new Intent(cContext.getApplicationContext(), MessageActivity.class));
         }
     }
 
     private class ContactHolder {
         private TextView tvFirstletter = null;
         private TextView tvName = null;
-        private ImageButton imgbtnSend = null;
+        private ImageButton imgBtnSend = null;
     }
 }

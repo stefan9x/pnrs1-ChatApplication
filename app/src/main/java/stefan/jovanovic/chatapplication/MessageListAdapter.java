@@ -19,33 +19,33 @@ import java.util.Collections;
 public class MessageListAdapter extends BaseAdapter {
 
     private Context cContext;
-    private ArrayList<MessageClass> arlstMessages;
+    private ArrayList<MessageClass> arLstMessages;
 
     private static final String MY_PREFS_NAME = "PrefsFile";
 
     public MessageListAdapter(Context context) {
         cContext = context;
-        arlstMessages = new ArrayList<MessageClass>();
+        arLstMessages = new ArrayList<MessageClass>();
     }
 
     public void update(MessageClass[] messages) {
-        arlstMessages.clear();
+        arLstMessages.clear();
         if (messages != null) {
-            Collections.addAll(arlstMessages, messages);
+            Collections.addAll(arLstMessages, messages);
         }
         notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return arlstMessages.size();
+        return arLstMessages.size();
     }
 
     @Override
     public Object getItem(int position) {
         Object contact = null;
         try {
-            contact = arlstMessages.get(position);
+            contact = arLstMessages.get(position);
         } catch (IndexOutOfBoundsException e) {
             e.printStackTrace();
         }
@@ -66,7 +66,7 @@ public class MessageListAdapter extends BaseAdapter {
 
             MessageListAdapter.MessageHolder holder = new MessageListAdapter.MessageHolder();
             holder.tvMessage = view.findViewById(R.id.tv_message);
-            holder.tvTime = view.findViewById(R.id.message_time);
+            holder.tvSender = view.findViewById(R.id.message_sender);
 
             view.setTag(holder);
         }
@@ -78,35 +78,34 @@ public class MessageListAdapter extends BaseAdapter {
         holder.tvMessage.setText(messageclass.getsMessage());
 
         // Setting time
-        holder.tvTime.setText(new SimpleDateFormat("HH:mm").format(Calendar.getInstance().getTime()));
+        holder.tvSender.setText(messageclass.getsSender());
 
         // Getting logged in user userid from shared preference file
         SharedPreferences prefs = cContext.getSharedPreferences(MY_PREFS_NAME, cContext.MODE_PRIVATE);
-        String sender_username = prefs.getString("loggedin_username", null);
+        String loggedinUsername = prefs.getString("loggedinUsername", null);
 
         // Setting text and background colors and gravity based on users
-        if ((messageclass.getsSender().compareTo(sender_username) == 0)) {
+        if ((messageclass.getsSender().compareTo(loggedinUsername) == 0)) {
             holder.tvMessage.setGravity(Gravity.RIGHT | Gravity.CENTER);
             holder.tvMessage.setTextColor(Color.rgb(255, 255, 255));
             holder.tvMessage.setBackgroundColor(Color.argb(50, 173, 173, 173));
-            holder.tvTime.setGravity(Gravity.RIGHT);
-            holder.tvTime.setTextColor(Color.rgb(255, 255, 255));
-            holder.tvTime.setBackgroundColor(Color.argb(50, 173, 173, 173));
+            holder.tvSender.setGravity(Gravity.RIGHT);
+            holder.tvSender.setTextColor(Color.rgb(255, 255, 255));
+            holder.tvSender.setBackgroundColor(Color.argb(50, 173, 173, 173));
         } else {
             holder.tvMessage.setGravity(Gravity.LEFT | Gravity.CENTER);
             holder.tvMessage.setTextColor(Color.rgb(234, 117, 0));
             holder.tvMessage.setBackgroundColor(Color.argb(0, 255, 255, 255));
-            holder.tvTime.setGravity(Gravity.LEFT);
-            holder.tvTime.setTextColor(Color.rgb(234, 117, 0));
-            holder.tvTime.setBackgroundColor(Color.argb(0, 255, 255, 255));
+            holder.tvSender.setGravity(Gravity.LEFT);
+            holder.tvSender.setTextColor(Color.rgb(234, 117, 0));
+            holder.tvSender.setBackgroundColor(Color.argb(0, 255, 255, 255));
         }
-
         return view;
     }
 
     private class MessageHolder {
         private TextView tvMessage = null;
-        private TextView tvTime = null;
+        private TextView tvSender = null;
     }
 }
 

@@ -145,40 +145,39 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.btn_new_register:
+                new Thread(new Runnable() {
+                    public void run() {
+                        JSONObject jsonObject = new JSONObject();
+                        try {
+                            jsonObject.put("username", etUsername.getText().toString());
+                            jsonObject.put("password", etPassword.getText().toString());
+                            jsonObject.put("email", etEmail.getText().toString());
 
-    // Starts contacts activity if register button is pressed
-    if (view.getId() == R.id.btn_new_register) {
+                            final boolean response = httphelper.registerUserOnServer(RegisterActivity.this, REGISTER_URL, jsonObject);
 
-        new Thread(new Runnable() {
-            public void run() {
-                JSONObject jsonObject = new JSONObject();
-                try {
-                    jsonObject.put("username", etUsername.getText().toString());
-                    jsonObject.put("password", etPassword.getText().toString());
-                    jsonObject.put("email", etEmail.getText().toString());
-
-                    final boolean response = httphelper.registerUserOnServer(RegisterActivity.this, REGISTER_URL, jsonObject);
-
-                    handler.post(new Runnable(){
-                        public void run() {
-                            if (response) {
-                                Toast.makeText(RegisterActivity.this, getText(R.string.success_user_register), Toast.LENGTH_SHORT).show();
-                                Intent LoginActivity_intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                                startActivity(LoginActivity_intent);
-                            } else {
-                                SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
-                                String err_msg = prefs.getString("register_err_msg", null);
-                                Toast.makeText(RegisterActivity.this, err_msg, Toast.LENGTH_SHORT).show();
-                            }
+                            handler.post(new Runnable(){
+                                public void run() {
+                                    if (response) {
+                                        Toast.makeText(RegisterActivity.this, getText(R.string.success_user_register), Toast.LENGTH_SHORT).show();
+                                        startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                                    } else {
+                                        SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+                                        String registerErr = prefs.getString("registerErr", null);
+                                        Toast.makeText(RegisterActivity.this, registerErr, Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                    });
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            }).start();
+                    }
+                }).start();
+                break;
+
         }
     }
 }

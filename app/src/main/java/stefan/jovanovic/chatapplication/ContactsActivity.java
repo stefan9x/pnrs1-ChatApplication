@@ -28,11 +28,10 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
     private Button btnRefresh;
     private TextView tvLoggedinas;
 
-    private ContactsListAdapter contactslistadapter;
-    //private ChatDbHelper chatDbHelper;
+    private ContactsListAdapter contactsListAdapter;
 
     private static final String MY_PREFS_NAME = "PrefsFile";
-    private String loggedin_username;
+    private String loggedinUsername;
 
     private HttpHelper httphelper;
     private Handler handler;
@@ -45,9 +44,6 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts);
 
-        // New chatdbhelper instance
-        //chatDbHelper = new ChatDbHelper(this);
-
         lvContacts = findViewById(R.id.contacts_list);
         btnLogout = findViewById(R.id.btn_logout);
         tvLoggedinas = findViewById(R.id.logged_user);
@@ -58,17 +54,17 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
         btnRefresh.setOnClickListener(this);
 
         // Adding contacts to list
-        contactslistadapter = new ContactsListAdapter(this);
+        contactsListAdapter = new ContactsListAdapter(this);
 
         // Setting adapter to contacts list
-        lvContacts.setAdapter(contactslistadapter);
+        lvContacts.setAdapter(contactsListAdapter);
         //lvContacts.setOnItemLongClickListener(this);
 
         // Getting logged user userid, from SharedPreference file
         SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
-        loggedin_username = prefs.getString("loggedin_username", null);
+        loggedinUsername = prefs.getString("loggedinUsername", null);
 
-        tvLoggedinas.setText(loggedin_username);
+        tvLoggedinas.setText(loggedinUsername);
 
         httphelper = new HttpHelper();
 
@@ -98,12 +94,12 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
                             handler.post(new Runnable(){
                                 public void run() {
-                                    if (!success) {
-                                        Toast.makeText(ContactsActivity.this, getText(R.string.error_cannot_logout), Toast.LENGTH_SHORT).show();
+                                    if (success) {
+                                        startActivity(new Intent(ContactsActivity.this, LoginActivity.class));
                                     } else {
-                                        Intent intMainactivity = new Intent(ContactsActivity.this, LoginActivity.class);
-                                        startActivity(intMainactivity);
-                                    }
+                                        SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+                                        String logoutErr = prefs.getString("logoutErr", null);
+                                        Toast.makeText(ContactsActivity.this, logoutErr, Toast.LENGTH_SHORT).show();}
                                 }
                             });
                         } catch (JSONException e) {
@@ -119,6 +115,42 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
                 updateContactList();
                 break;
         }
+    }
+
+    // Updating contacts list and adding bot to database
+    public void updateContactList() {
+
+        new Thread(new Runnable() {
+            ContactClass[] contactsClass;
+            public void run() {
+                try {
+                    final JSONArray contacts = httphelper.getContactsFromServer(ContactsActivity.this, CONTACTS_URL);
+                    handler.post(new Runnable(){
+                        public void run() {
+                            if (contacts != null) {
+
+                                JSONObject json_contact;
+                                contactsClass = new ContactClass[contacts.length()];
+
+                                for (int i = 0; i < contacts.length(); i++) {
+                                    try {
+                                        json_contact = contacts.getJSONObject(i);
+                                        contactsClass[i] = new ContactClass(json_contact.getString("username"));
+                                    } catch (JSONException e1) {
+                                        e1.printStackTrace();
+                                    }
+                                }
+                                contactsListAdapter.update(contactsClass);
+                            }
+                        }
+                    });
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     @Override
@@ -162,41 +194,5 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
         alert.show();
 */
         return false;
-    }
-
-    // Updating contacts list and adding bot to database
-    public void updateContactList() {
-
-        new Thread(new Runnable() {
-            ContactClass[] contacts_class;
-            public void run() {
-                try {
-                    final JSONArray contacts = httphelper.getContactsFromServer(ContactsActivity.this, CONTACTS_URL);
-                    handler.post(new Runnable(){
-                        public void run() {
-                            if (contacts != null) {
-
-                                JSONObject json_contact;
-                                contacts_class = new ContactClass[contacts.length()];
-
-                                for (int i = 0; i < contacts.length(); i++) {
-                                    try {
-                                        json_contact = contacts.getJSONObject(i);
-                                        contacts_class[i] = new ContactClass(json_contact.getString("username"));
-                                    } catch (JSONException e1) {
-                                        e1.printStackTrace();
-                                    }
-                                }
-                                contactslistadapter.update(contacts_class);
-                            }
-                        }
-                    });
-                } catch (JSONException e1) {
-                    e1.printStackTrace();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        }).start();
     }
 }

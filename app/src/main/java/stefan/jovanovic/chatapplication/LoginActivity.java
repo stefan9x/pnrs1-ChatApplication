@@ -24,9 +24,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     private EditText etPassword;
     private Button btnLogin;
     private Button btnRegister;
-    private int backbtn_counter;
-
-    //private ChatDbHelper chatDbHelper;
+    private int backbtnCounter;
 
     public static final String MY_PREFS_NAME = "PrefsFile";
 
@@ -114,8 +112,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         switch (view.getId()){
             // Starting register activity
             case R.id.btn_register:
-                Intent RegisterActivity_intent = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivity(RegisterActivity_intent);
+                startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
                 break;
 
             // Logining in on server
@@ -133,15 +130,14 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                                 public void run() {
                                     if (response) {
                                         SharedPreferences.Editor editor = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
-                                        editor.putString("loggedin_username", etUsername.getText().toString());
+                                        editor.putString("loggedinUsername", etUsername.getText().toString());
                                         editor.apply();
 
-                                        Intent LoginActivity_intent = new Intent(LoginActivity.this, ContactsActivity.class);
-                                        startActivity(LoginActivity_intent);
+                                        startActivity(new Intent(LoginActivity.this, ContactsActivity.class));
                                     } else {
                                         SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
-                                        String err_msg = prefs.getString("login_err_msg", null);
-                                        Toast.makeText(LoginActivity.this, err_msg, Toast.LENGTH_SHORT).show();
+                                        String loginErr = prefs.getString("loginErr", null);
+                                        Toast.makeText(LoginActivity.this, loginErr, Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
@@ -160,14 +156,14 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     @Override
     public void onBackPressed() {
         //Display toast message if user try to leave main activity with back button
-        if (backbtn_counter >= 1) {
+        if (backbtnCounter >= 1) {
             Intent Exit_intent = new Intent(Intent.ACTION_MAIN);
             Exit_intent.addCategory(Intent.CATEGORY_HOME);
             Exit_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(Exit_intent);
         } else {
             Toast.makeText(this, getText(R.string.main_activity_backbtn_toast), Toast.LENGTH_SHORT).show();
-            backbtn_counter++;
+            backbtnCounter++;
         }
     }
 }
