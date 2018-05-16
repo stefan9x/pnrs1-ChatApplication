@@ -20,8 +20,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
-public class ContactsActivity extends Activity implements View.OnClickListener, AdapterView.OnItemLongClickListener {
+public class ContactsActivity extends Activity implements View.OnClickListener, AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener {
 
     private ListView lvContacts;
     private Button btnLogout;
@@ -35,9 +41,11 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
     private HttpHelper httphelper;
     private Handler handler;
+
     private static String BASE_URL = "http://18.205.194.168:80";
     private static String CONTACTS_URL = BASE_URL + "/contacts";
     private static String LOGOUT_URL = BASE_URL + "/logout";
+    private static String GET_MESSAGE_URL = BASE_URL + "/message/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +66,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
         // Setting adapter to contacts list
         lvContacts.setAdapter(contactsListAdapter);
+        lvContacts.setOnItemClickListener(this);
         //lvContacts.setOnItemLongClickListener(this);
 
         // Getting logged user userid, from SharedPreference file
@@ -70,6 +79,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
         handler = new Handler();
 
+
     }
 
     @Override
@@ -78,6 +88,8 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
         // Updating list
         updateContactList();
+
+
     }
 
     @Override
@@ -118,6 +130,8 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
     }
 
     // Updating contacts list and adding bot to database
+
+
     public void updateContactList() {
 
         new Thread(new Runnable() {
@@ -135,7 +149,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
                                 for (int i = 0; i < contacts.length(); i++) {
                                     try {
                                         json_contact = contacts.getJSONObject(i);
-                                        contactsClass[i] = new ContactClass(json_contact.getString("username"));
+                                        contactsClass[i] = new ContactClass(json_contact.getString("username"), "Tap to get last message");
                                     } catch (JSONException e1) {
                                         e1.printStackTrace();
                                     }
@@ -151,6 +165,51 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
                 }
             }
         }).start();
+    }
+
+    public void getLastMsg(ContactClass oldContact){
+        final String contact = oldContact.getsUserName();
+        final ContactClass oldContactTemp = oldContact;
+
+        new Thread(new Runnable() {
+
+            public void run() {
+
+                try {
+                    final JSONArray messages = httphelper.getMessagesFromServer(ContactsActivity.this, GET_MESSAGE_URL+contact);
+
+                    handler.post(new Runnable(){
+                        public void run() {
+                            if (messages != null) {
+                                String lastMsg = "No Messages";
+                                JSONObject json_message;
+                                if (messages.length()>0){
+                                    int lastMsgIndex = messages.length()-1;
+                                    try {
+                                        json_message = messages.getJSONObject(lastMsgIndex);
+                                        lastMsg = json_message.getString("sender") +": " + json_message.getString("data");
+                                    } catch (JSONException e1) {
+                                        e1.printStackTrace();
+                                    }
+                                }
+                                ContactClass newContact = new ContactClass(contact, lastMsg);
+                                contactsListAdapter.updateOne(oldContactTemp, newContact);
+                            }
+                        }
+                    });
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+        ContactClass oldContact = (ContactClass) contactsListAdapter.getItem(position);
+        getLastMsg(oldContact);
     }
 
     @Override
@@ -195,4 +254,5 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 */
         return false;
     }
+
 }

@@ -10,20 +10,36 @@
             android:layout_height="60dp"
             android:gravity="center"
             android:textSize="25sp"
-            android:layout_alignParentLeft="true" />
+            android:layout_alignParentStart="true" />
 
-        <TextView
-            android:layout_width="200dp"
+        <RelativeLayout
+            android:layout_width="260dp"
             android:layout_height="60dp"
-            android:gravity="center"
-            android:textSize="20sp"
-            android:layout_toRightOf="@id/tv_name_first_letter"
-            android:id="@+id/tv_contact_name" />
+            android:layout_toEndOf="@id/tv_name_first_letter"
+            android:layout_toStartOf="@+id/imgbtn_send">
+                <TextView
+                    android:id="@+id/tv_contact_name"
+                    android:layout_width="260dp"
+                    android:layout_height="30dp"
+                    android:gravity="center|start"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tv_contact_last_msg"
+                    android:layout_width="260dp"
+                    android:layout_height="30dp"
+                    android:gravity="center|start"
+                    android:layout_below="@+id/tv_contact_name"
+                    android:textSize="12sp" />
+
+
+        </RelativeLayout>
+
 
         <ImageButton
             android:id="@+id/imgbtn_send"
-            android:layout_alignParentRight="true"
-            android:layout_toRightOf="@id/tv_contact_name"
+            android:contentDescription="Send button"
+            android:layout_alignParentEnd="true"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:background="@null"

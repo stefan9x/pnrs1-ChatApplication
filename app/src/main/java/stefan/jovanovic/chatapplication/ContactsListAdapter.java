@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +46,14 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
         notifyDataSetChanged();
     }
 
+    public void updateOne(ContactClass oldContact, ContactClass newContact) {
+
+        int index = arLstContacts.indexOf(oldContact);
+        arLstContacts.set(index, newContact);
+
+        notifyDataSetChanged();
+    }
+
     // Remove contact from list
     public void removecontact(int position) {
         arLstContacts.remove(position);
@@ -83,6 +92,7 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
             holder.tvFirstletter = view.findViewById(R.id.tv_name_first_letter);
             holder.tvName = view.findViewById(R.id.tv_contact_name);
             holder.imgBtnSend = view.findViewById(R.id.imgbtn_send);
+            holder.tvLastMsg = view.findViewById(R.id.tv_contact_last_msg);
             holder.imgBtnSend.setOnClickListener(this);
             view.setTag(holder);
         }
@@ -100,7 +110,14 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
 
         // Setting text to name
         String name = contactclass.getsUserName();
-        holder.tvName.setText(name);
+        if (name.length() > 20) {
+            String trimmedName = name.substring(0,20)+"...";
+            holder.tvName.setText(trimmedName);
+        } else {
+            holder.tvName.setText(name);
+        }
+        String lastMsg = contactclass.getsLastMsg();
+        holder.tvLastMsg.setText(lastMsg);
 
         // Setting contact id on button tag
         holder.imgBtnSend.setTag(contactclass.getsUserName());
@@ -125,6 +142,7 @@ public class ContactsListAdapter extends BaseAdapter implements View.OnClickList
     private class ContactHolder {
         private TextView tvFirstletter = null;
         private TextView tvName = null;
+        private TextView tvLastMsg = null;
         private ImageButton imgBtnSend = null;
     }
 }

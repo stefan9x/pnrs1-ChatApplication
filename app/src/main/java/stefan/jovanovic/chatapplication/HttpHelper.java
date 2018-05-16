@@ -282,7 +282,6 @@ public class HttpHelper {
         } catch (IOException e) {
             return null;
         }
-
         BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
         StringBuilder sb = new StringBuilder();
 
