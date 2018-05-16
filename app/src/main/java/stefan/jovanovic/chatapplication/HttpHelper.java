@@ -310,4 +310,20 @@ public class HttpHelper {
             return null;
         }
     }
+
+    public boolean checkServer(String urlString) throws IOException {
+
+        HttpURLConnection urlConnection;
+        java.net.URL url = new URL(urlString);
+        urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setRequestProperty("Connection", "close");
+        urlConnection.setConnectTimeout(2000 /* milliseconds */ );
+
+        try {
+            urlConnection.connect();
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
 }

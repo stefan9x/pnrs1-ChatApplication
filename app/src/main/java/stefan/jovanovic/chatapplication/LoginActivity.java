@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -11,12 +14,14 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 public class LoginActivity extends Activity implements View.OnClickListener {
 
@@ -24,6 +29,8 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     private EditText etPassword;
     private Button btnLogin;
     private Button btnRegister;
+    private TextView tvConnStatus;
+    private TextView tvServerStatus;
     private int backbtnCounter;
 
     public static final String MY_PREFS_NAME = "PrefsFile";
@@ -87,6 +94,8 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         etUsername = findViewById(R.id.et_username);
         btnLogin = findViewById(R.id.btn_login);
         btnRegister = findViewById(R.id.btn_register);
+        tvConnStatus = findViewById(R.id.connection_status);
+        tvServerStatus = findViewById(R.id.server_status);
 
         // Adds text watchers on username and password fields
         etUsername.addTextChangedListener(twLogin);
@@ -104,6 +113,49 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         // Initialization
         httphelper = new HttpHelper();
         handler = new Handler();
+
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        if (activeNetworkInfo != null) {
+            if (activeNetworkInfo.isConnected()) {
+                tvConnStatus.setText(getText(R.string.on));
+                tvConnStatus.setTextColor(Color.rgb(0, 255, 0));
+            } else {
+                tvConnStatus.setText(getText(R.string.off));
+                tvConnStatus.setTextColor(Color.rgb(255, 0, 0));
+            }
+        } else {
+            tvConnStatus.setText(getText(R.string.off));
+            tvConnStatus.setTextColor(Color.rgb(255, 0, 0));
+        }
+
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    final boolean response = httphelper.checkServer(BASE_URL);
+
+                    handler.post(new Runnable(){
+                        public void run() {
+                            if (response) {
+                                tvServerStatus.setText(getText(R.string.online));
+                                tvServerStatus.setTextColor(Color.rgb(0, 255, 0));
+                            } else {
+                                tvServerStatus.setText(getText(R.string.offline));
+                                tvServerStatus.setTextColor(Color.rgb(255, 0, 0));
+                            }
+                        }
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     @Override

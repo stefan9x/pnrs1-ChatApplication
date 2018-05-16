@@ -1,50 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context="stefan.jovanovic.chatapplication.LoginActivity">
 
-    <EditText
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:paddingTop="100dp"
-        android:layout_gravity="center_horizontal"
-        android:hint="@string/username"
-        android:id="@+id/et_username"/>
-
-    <EditText
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:paddingTop="5dp"
-        android:layout_gravity="center_horizontal"
-        android:inputType="textPassword"
-        android:hint="@string/password"
-        android:id="@+id/et_password"/>
-
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="50dp"
-        android:layout_gravity="center_horizontal">
+        android:layout_centerHorizontal="true"
+        android:paddingTop="150dp"
+        android:id="@+id/input_fields">
+
+        <EditText
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:hint="@string/username"
+            android:id="@+id/et_username"
+            android:inputType="text"/>
+
+        <EditText
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:layout_below="@+id/et_username"
+            android:paddingTop="5dp"
+            android:inputType="textPassword"
+            android:hint="@string/password"
+            android:id="@+id/et_password"/></RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/input_fields"
+        android:layout_centerHorizontal="true">
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="@string/login"
             android:id="@+id/btn_login"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="@string/register"
-            android:id="@+id/btn_register"/>
-    </LinearLayout>
+            android:id="@+id/btn_register"
+            android:layout_toEndOf="@+id/btn_login"/>
+    </RelativeLayout>
 
-</LinearLayout>
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:text="@string/connection"
+            android:id="@+id/connection"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/connection"
+            android:id="@+id/connection_status"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@+id/server_status"
+            android:text="@string/server"/>
+
+        <TextView
+            android:id="@+id/server_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"/>
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

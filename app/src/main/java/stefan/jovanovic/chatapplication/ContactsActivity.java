@@ -149,7 +149,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
                                 for (int i = 0; i < contacts.length(); i++) {
                                     try {
                                         json_contact = contacts.getJSONObject(i);
-                                        contactsClass[i] = new ContactClass(json_contact.getString("username"), "Tap to get last message");
+                                        contactsClass[i] = new ContactClass(json_contact.getString("username"), getText(R.string.tap_to_get_msg).toString());
                                     } catch (JSONException e1) {
                                         e1.printStackTrace();
                                     }
@@ -181,7 +181,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
                     handler.post(new Runnable(){
                         public void run() {
                             if (messages != null) {
-                                String lastMsg = "No Messages";
+                                String lastMsg = getText(R.string.tap_to_get_msg).toString();
                                 JSONObject json_message;
                                 if (messages.length()>0){
                                     int lastMsgIndex = messages.length()-1;

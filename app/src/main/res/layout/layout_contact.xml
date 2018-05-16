@@ -20,17 +20,17 @@
                 <TextView
                     android:id="@+id/tv_contact_name"
                     android:layout_width="260dp"
+                    android:paddingStart="10dp"
                     android:layout_height="30dp"
-                    android:gravity="center|start"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"/>
 
                 <TextView
                     android:id="@+id/tv_contact_last_msg"
                     android:layout_width="260dp"
                     android:layout_height="30dp"
-                    android:gravity="center|start"
+                    android:paddingStart="10dp"
                     android:layout_below="@+id/tv_contact_name"
-                    android:textSize="12sp" />
+                    android:textSize="13sp" />
 
 
         </RelativeLayout>

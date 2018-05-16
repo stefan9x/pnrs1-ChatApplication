@@ -39,4 +39,11 @@
     <string name="error_cannot_logout">Cannot logout</string>
     <string name="error_message_not_send">Message not send</string>
     <string name="chatting_with_text">Chatting:</string>
+    <string name="connection">Connection:</string>
+    <string name="server">Server:</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
+    <string name="online">Online</string>
+    <string name="offline">Offline</string>
+    <string name="tap_to_get_msg">Tap to show last message</string>
 </resources>
