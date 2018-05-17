@@ -1,9 +1,6 @@
 package stefan.jovanovic.chatapplication;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -20,12 +17,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 public class ContactsActivity extends Activity implements View.OnClickListener, AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener {
 
@@ -79,7 +70,6 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
         handler = new Handler();
 
-
     }
 
     @Override
@@ -88,8 +78,6 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
         // Updating list
         updateContactList();
-
-
     }
 
     @Override
@@ -101,9 +89,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
                 new Thread(new Runnable() {
                     public void run() {
                         try {
-
                             final boolean success = httphelper.logOutUserFromServer(ContactsActivity.this, LOGOUT_URL);
-
                             handler.post(new Runnable(){
                                 public void run() {
                                     if (success) {
@@ -129,11 +115,8 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
         }
     }
 
-    // Updating contacts list and adding bot to database
-
-
+    // Updating contacts list
     public void updateContactList() {
-
         new Thread(new Runnable() {
             ContactClass[] contactsClass;
             public void run() {
@@ -142,7 +125,6 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
                     handler.post(new Runnable(){
                         public void run() {
                             if (contacts != null) {
-
                                 JSONObject json_contact;
                                 contactsClass = new ContactClass[contacts.length()];
 
@@ -174,14 +156,12 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
         new Thread(new Runnable() {
 
             public void run() {
-
                 try {
                     final JSONArray messages = httphelper.getMessagesFromServer(ContactsActivity.this, GET_MESSAGE_URL+contact);
-
                     handler.post(new Runnable(){
                         public void run() {
                             if (messages != null) {
-                                String lastMsg = getText(R.string.tap_to_get_msg).toString();
+                                String lastMsg = getText(R.string.no_new_messages).toString();
                                 JSONObject json_message;
                                 if (messages.length()>0){
                                     int lastMsgIndex = messages.length()-1;

@@ -46,4 +46,6 @@
     <string name="online">Online</string>
     <string name="offline">Offline</string>
     <string name="tap_to_get_msg">Tap to show last message</string>
+    <string name="no_new_messages">No new messages</string>
+    <string name="send_btn">Send button</string>
 </resources>

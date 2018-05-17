@@ -1,8 +1,6 @@
 package stefan.jovanovic.chatapplication;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -16,15 +14,12 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.Random;
 
 public class MessageActivity extends Activity implements View.OnClickListener, AdapterView.OnItemLongClickListener {
 
