@@ -39,9 +39,6 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     private HttpHelper httphelper;
     private Handler handler;
 
-    private static String BASE_URL = "http://18.205.194.168:80";
-    private static String LOGIN_URL = BASE_URL + "/login";
-
     public TextWatcher twLogin = new TextWatcher() {
 
         @Override
@@ -137,7 +134,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    final boolean response = httphelper.checkServer(BASE_URL);
+                    final boolean response = httphelper.checkServer();
 
                     handler.post(new Runnable(){
                         public void run() {
@@ -175,7 +172,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                             jsonObject.put("username", etUsername.getText().toString());
                             jsonObject.put("password", etPassword.getText().toString());
 
-                            final boolean response = httphelper.logInUserOnServer(context, LOGIN_URL, jsonObject);
+                            final boolean response = httphelper.logInUserOnServer(context, jsonObject);
 
                             handler.post(new Runnable(){
                                 public void run() {

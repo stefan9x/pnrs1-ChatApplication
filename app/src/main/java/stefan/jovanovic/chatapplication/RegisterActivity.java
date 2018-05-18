@@ -33,9 +33,6 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
     private HttpHelper httphelper;
     private Handler handler;
 
-    private static String BASE_URL = "http://18.205.194.168:80";
-    private static String REGISTER_URL = BASE_URL + "/register";
-
     public static final String MY_PREFS_NAME = "PrefsFile";
 
     public TextWatcher twRegister = new TextWatcher() {
@@ -154,7 +151,7 @@ public class RegisterActivity extends Activity implements View.OnClickListener {
                             jsonObject.put("password", etPassword.getText().toString());
                             jsonObject.put("email", etEmail.getText().toString());
 
-                            final boolean response = httphelper.registerUserOnServer(RegisterActivity.this, REGISTER_URL, jsonObject);
+                            final boolean response = httphelper.registerUserOnServer(RegisterActivity.this, jsonObject);
 
                             handler.post(new Runnable(){
                                 public void run() {

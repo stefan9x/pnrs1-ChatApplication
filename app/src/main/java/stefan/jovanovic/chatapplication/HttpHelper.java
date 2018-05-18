@@ -21,11 +21,20 @@ public class HttpHelper {
 
     private static final int SUCCESS = 200;
     public static final String MY_PREFS_NAME = "PrefsFile";
+    private static String BASE_URL = "http://18.205.194.168:80";
+    private static String CONTACTS_URL = BASE_URL + "/contacts";
+    private static String LOGIN_URL = BASE_URL + "/login";
+    private static String LOGOUT_URL = BASE_URL + "/logout";
+    private static String GET_MESSAGE_URL = BASE_URL + "/message/";
+    private static String POST_MESSAGE_URL = "/message";
+    private static String DELETE_CONTACT_URL = BASE_URL + "/contact/";
+    private static String REGISTER_URL = BASE_URL + "/register";
+    private static String DELETE_MESSAGE = BASE_URL + "/message";
 
-    public boolean registerUserOnServer(Context context, String urlString, JSONObject jsonObject) throws IOException{
+    public boolean registerUserOnServer(Context context, JSONObject jsonObject) throws IOException{
 
         HttpURLConnection urlConnection;
-        java.net.URL url = new URL(urlString);
+        java.net.URL url = new URL(REGISTER_URL);
 
         urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setRequestMethod("POST");
@@ -68,10 +77,10 @@ public class HttpHelper {
         return (responseCode==SUCCESS);
     }
 
-    public boolean logInUserOnServer(Context context, String urlString, JSONObject jsonObject) throws IOException{
+    public boolean logInUserOnServer(Context context, JSONObject jsonObject) throws IOException{
 
         HttpURLConnection urlConnection;
-        java.net.URL url = new URL(urlString);
+        java.net.URL url = new URL(LOGIN_URL);
 
         urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setRequestMethod("POST");
@@ -118,10 +127,10 @@ public class HttpHelper {
         return (responseCode==SUCCESS);
     }
 
-    public JSONArray getContactsFromServer(Context context, String urlString) throws IOException, JSONException {
+    public JSONArray getContactsFromServer(Context context) throws IOException, JSONException {
 
         HttpURLConnection urlConnection;
-        java.net.URL url = new URL(urlString);
+        java.net.URL url = new URL(CONTACTS_URL);
         urlConnection = (HttpURLConnection) url.openConnection();
 
 
@@ -171,10 +180,10 @@ public class HttpHelper {
 
     }
 
-    public boolean logOutUserFromServer(Context context, String urlString) throws IOException, JSONException {
+    public boolean logOutUserFromServer(Context context) throws IOException, JSONException {
 
         HttpURLConnection urlConnection;
-        java.net.URL url = new URL(urlString);
+        java.net.URL url = new URL(LOGOUT_URL);
 
         SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
         String sessionId = prefs.getString("sessionId", null);
@@ -210,10 +219,10 @@ public class HttpHelper {
         return (responseCode==SUCCESS);
     }
 
-    public boolean sendMessageToServer(Context context, String urlString, JSONObject jsonObject) throws IOException, JSONException {
+    public boolean sendMessageToServer(Context context, JSONObject jsonObject) throws IOException, JSONException {
 
         HttpURLConnection urlConnection;
-        java.net.URL url = new URL(urlString);
+        java.net.URL url = new URL(POST_MESSAGE_URL);
 
         SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
         String sessionId = prefs.getString("sessionId", null);
@@ -259,10 +268,10 @@ public class HttpHelper {
         return (responseCode==SUCCESS);
     }
 
-    public JSONArray getMessagesFromServer(Context context, String urlString) throws IOException, JSONException {
+    public JSONArray getMessagesFromServer(Context context, String contact) throws IOException, JSONException {
 
         HttpURLConnection urlConnection;
-        java.net.URL url = new URL(urlString);
+        java.net.URL url = new URL(GET_MESSAGE_URL + contact);
         urlConnection = (HttpURLConnection) url.openConnection();
 
 
@@ -310,9 +319,9 @@ public class HttpHelper {
     }
 
     /*HTTP delete*/
-    public boolean deleteUserFromServer(Context context, String urlString) throws IOException, JSONException {
+    public boolean deleteUserFromServer(Context context, String contact) throws IOException, JSONException {
         HttpURLConnection urlConnection = null;
-        java.net.URL url = new URL(urlString);
+        java.net.URL url = new URL(DELETE_CONTACT_URL + contact);
         urlConnection = (HttpURLConnection) url.openConnection();
 
         SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
@@ -332,24 +341,73 @@ public class HttpHelper {
 
         int responseCode =  urlConnection.getResponseCode();
 
-        SharedPreferences.Editor editor = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
 
 
-        String responseMsg = urlConnection.getResponseMessage();
-        String sendMsgErr = Integer.toString(responseCode) + " : " + responseMsg;
-        editor.putString("deleteContactErr", sendMsgErr);
-        editor.apply();
-
+        if (responseCode != SUCCESS) {
+            SharedPreferences.Editor editor = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
+            String responseMsg = urlConnection.getResponseMessage();
+            String deleteContactErr = Integer.toString(responseCode) + " : " + responseMsg;
+            editor.putString("deleteContactErr", deleteContactErr);
+            editor.apply();
+        }
 
         urlConnection.disconnect();
 
         return (responseCode==SUCCESS);
     }
 
-    public boolean checkServer(String urlString) throws IOException {
+    /*HTTP delete*/
+    public boolean deleteMessageFromServer(Context context, JSONObject jsonObject) throws IOException, JSONException {
+
+        HttpURLConnection urlConnection = null;
+        java.net.URL url = new URL(DELETE_MESSAGE);
+        urlConnection = (HttpURLConnection) url.openConnection();
+
+        SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+        String sessionId = prefs.getString("sessionId", null);
+
+        urlConnection.setRequestMethod("DELETE");
+        urlConnection.setRequestProperty("sessionid",sessionId);
+        urlConnection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
+        urlConnection.setRequestProperty("Accept","application/json");
+
+        urlConnection.setReadTimeout(1000 /* milliseconds */ );
+        urlConnection.setConnectTimeout(15000 /* milliseconds */ );
+
+        /*needed when used POST or PUT methods*/
+        urlConnection.setDoOutput(true);
+        urlConnection.setDoInput(true);
+
+        try {
+            urlConnection.connect();
+        } catch (IOException e) {
+            return false;
+        }
+
+        DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
+        os.writeBytes(jsonObject.toString());
+
+        os.flush();
+        os.close();
+
+        int responseCode =  urlConnection.getResponseCode();
+
+        if (responseCode != SUCCESS) {
+            SharedPreferences.Editor editor = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
+            String responseMsg = urlConnection.getResponseMessage();
+            String deleteMsgErr = Integer.toString(responseCode) + " : " + responseMsg;
+            editor.putString("deleteMsgErr", deleteMsgErr);
+            editor.apply();
+        }
+
+        urlConnection.disconnect();
+        return (responseCode==SUCCESS);
+    }
+
+    public boolean checkServer() throws IOException {
 
         HttpURLConnection urlConnection;
-        java.net.URL url = new URL(urlString);
+        java.net.URL url = new URL(BASE_URL);
         urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setRequestProperty("Connection", "close");
         urlConnection.setConnectTimeout(2000 /* milliseconds */ );

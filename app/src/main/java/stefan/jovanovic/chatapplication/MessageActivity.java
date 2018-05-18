@@ -1,6 +1,8 @@
 package stefan.jovanovic.chatapplication;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -34,11 +36,6 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
 
     private static final String MY_PREFS_NAME = "PrefsFile";
     private String receiverUsername;
-
-    private static String BASE_URL = "http://18.205.194.168:80";
-    private static String POST_MESSAGE_URL = BASE_URL + "/message";
-    private static String GET_MESSAGE_URL = BASE_URL + "/message/";
-    private static String LOGOUT_URL = BASE_URL + "/logout";
 
     public MessageClass[] messageClass;
 
@@ -126,7 +123,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
                 new Thread(new Runnable() {
                     public void run() {
                         try {
-                            final boolean response = httphelper.logOutUserFromServer(MessageActivity.this, LOGOUT_URL);
+                            final boolean response = httphelper.logOutUserFromServer(MessageActivity.this);
                             handler.post(new Runnable(){
                                 public void run() {
                                     if (response) {
@@ -159,7 +156,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
                             jsonObject.put("receiver", receiverUsername);
                             jsonObject.put("data", etMessage.getText().toString());
 
-                            final boolean success = httphelper.sendMessageToServer(MessageActivity.this, POST_MESSAGE_URL, jsonObject);
+                            final boolean success = httphelper.sendMessageToServer(MessageActivity.this, jsonObject);
 
                             handler.post(new Runnable(){
                                 public void run() {
@@ -191,7 +188,7 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
 
             public void run() {
                 try {
-                    final JSONArray messages = httphelper.getMessagesFromServer(MessageActivity.this, GET_MESSAGE_URL+receiverUsername);
+                    final JSONArray messages = httphelper.getMessagesFromServer(MessageActivity.this, receiverUsername);
 
                     handler.post(new Runnable(){
                         public void run() {
@@ -228,44 +225,77 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
-        /*final MessageClass message = (MessageClass) messagelistadapter.getItem(position);
+        final MessageClass messageForDelete = (MessageClass) messageListAdapter.getItem(position);
 
-        // Check if user is deleting his messages, if not, show toast
-        if (message.getsSenderId().compareTo(sender_userid) == 0) {
-            // Delete confirmation dialog
-            AlertDialog.Builder alert = new AlertDialog.Builder(this);
-            alert.setTitle(getText(R.string.dialog_delete_title));
-            alert.setMessage(getText(R.string.dialog_delete_message_confirmation_text));
+        // Delete confirmation dialog
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle(getText(R.string.dialog_delete_title));
+        alert.setMessage(getText(R.string.dialog_delete_message_confirmation_text));
 
-            alert.setPositiveButton(getText(R.string.dialog_delete_positive_btn), new OnClickListener() {
+        alert.setPositiveButton(getText(R.string.dialog_delete_positive_btn), new DialogInterface.OnClickListener() {
 
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
 
-                    // Deleting message from database
-                    //chatDbHelper.deleteMessage(message.getsMessageId());
+                new Thread(new Runnable() {
+                    public void run() {
 
-                    // Updating messages list
-                    //updateMessagesList(sender_userid, receiver_userid);
-                }
-            });
+                        try {
+                            JSONObject jsonObject = new JSONObject();
+                            String contact = messageForDelete.getsSender();
+                            String msg = messageForDelete.getsMessage();
 
-            alert.setNegativeButton(getText(R.string.dialog_delete_negative_btn), new OnClickListener() {
+                            SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+                            String loggedInUser = prefs.getString("loggedinUsername", null);
 
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
+                            if (loggedInUser.compareTo(contact) == 0){
+                                jsonObject.put("sender", loggedInUser);
+                                jsonObject.put("receiver", receiverUsername);
+                                jsonObject.put("data", msg);
+                            } else {
+                                jsonObject.put("sender", receiverUsername);
+                                jsonObject.put("receiver", loggedInUser);
+                                jsonObject.put("data", msg);
+                            }
 
-                    dialog.dismiss();
-                }
-            });
+                            final boolean response = httphelper.deleteMessageFromServer(MessageActivity.this, jsonObject);
 
-            alert.show();
+                            handler.post(new Runnable(){
+                                public void run() {
+                                    if (response) {
+                                        Toast.makeText(MessageActivity.this, getText(R.string.success_msg_delete).toString(), Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+                                        String deleteMsgErr = prefs.getString("deleteMsgErr", null);
+                                        Toast.makeText(MessageActivity.this, deleteMsgErr, Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
 
-            return true;
-        } else {
-            Toast.makeText(this, getText(R.string.error_delete_only_your_messages), Toast.LENGTH_SHORT).show();
-            return false;
-        }*/
-        return false;
+                            // Updating list
+                            updateMessagesList();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+        });
+
+        alert.setNegativeButton(getText(R.string.dialog_delete_negative_btn), new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.dismiss();
+            }
+        });
+
+        alert.show();
+
+        return true;
+
     }
 }

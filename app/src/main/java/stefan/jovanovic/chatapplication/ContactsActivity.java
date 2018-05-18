@@ -35,12 +35,6 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
     private HttpHelper httphelper;
     private Handler handler;
 
-    private static String BASE_URL = "http://18.205.194.168:80";
-    private static String CONTACTS_URL = BASE_URL + "/contacts";
-    private static String LOGOUT_URL = BASE_URL + "/logout";
-    private static String GET_MESSAGE_URL = BASE_URL + "/message/";
-    private static String DELETE_CONTACT_URL = BASE_URL + "/contact/";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,7 +86,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
                 new Thread(new Runnable() {
                     public void run() {
                         try {
-                            final boolean success = httphelper.logOutUserFromServer(ContactsActivity.this, LOGOUT_URL);
+                            final boolean success = httphelper.logOutUserFromServer(ContactsActivity.this);
                             handler.post(new Runnable(){
                                 public void run() {
                                     if (success) {
@@ -124,7 +118,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
             ContactClass[] contactsClass;
             public void run() {
                 try {
-                    final JSONArray contacts = httphelper.getContactsFromServer(ContactsActivity.this, CONTACTS_URL);
+                    final JSONArray contacts = httphelper.getContactsFromServer(ContactsActivity.this);
                     handler.post(new Runnable(){
                         public void run() {
                             if (contacts != null) {
@@ -160,7 +154,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
             public void run() {
                 try {
-                    final JSONArray messages = httphelper.getMessagesFromServer(ContactsActivity.this, GET_MESSAGE_URL+contact);
+                    final JSONArray messages = httphelper.getMessagesFromServer(ContactsActivity.this, contact);
                     handler.post(new Runnable(){
                         public void run() {
                             if (messages != null) {
@@ -198,7 +192,6 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
     @Override
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
 
-        final int deletePos = position;
         final ContactClass contactForDelete = (ContactClass) contactsListAdapter.getItem(position);
 
         // Delete confirmation dialog
@@ -219,14 +212,12 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
                         try {
                             String usernameForDelete = contactForDelete.getsUserName();
 
-                            final boolean response = httphelper.deleteUserFromServer(ContactsActivity.this, DELETE_CONTACT_URL+usernameForDelete);
+                            final boolean response = httphelper.deleteUserFromServer(ContactsActivity.this, usernameForDelete);
 
                             handler.post(new Runnable(){
                                 public void run() {
                                     if (response) {
-                                        SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
-                                        String deleteContactErr = prefs.getString("deleteContactErr", null);
-                                        Toast.makeText(ContactsActivity.this, deleteContactErr, Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(ContactsActivity.this, getText(R.string.success_contact_delete).toString(), Toast.LENGTH_SHORT).show();
                                     } else {
                                         SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
                                         String deleteContactErr = prefs.getString("deleteContactErr", null);
