@@ -1,6 +1,8 @@
 package stefan.jovanovic.chatapplication;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -37,6 +39,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
     private static String CONTACTS_URL = BASE_URL + "/contacts";
     private static String LOGOUT_URL = BASE_URL + "/logout";
     private static String GET_MESSAGE_URL = BASE_URL + "/message/";
+    private static String DELETE_CONTACT_URL = BASE_URL + "/contact/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +61,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
         // Setting adapter to contacts list
         lvContacts.setAdapter(contactsListAdapter);
         lvContacts.setOnItemClickListener(this);
-        //lvContacts.setOnItemLongClickListener(this);
+        lvContacts.setOnItemLongClickListener(this);
 
         // Getting logged user userid, from SharedPreference file
         SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
@@ -194,18 +197,15 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
     @Override
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
-/*
-        final int deletePos = position;
 
-        final ContactClass contact = (ContactClass) contactslistadapter.getItem(deletePos);
-        if (contact.getsUserName().compareTo("chatbot") == 0) {
-            Toast.makeText(this, getText(R.string.error_bot_respawn), Toast.LENGTH_SHORT).show();
-        }
+        final int deletePos = position;
+        final ContactClass contactForDelete = (ContactClass) contactsListAdapter.getItem(position);
 
         // Delete confirmation dialog
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle(getText(R.string.dialog_delete_title));
         alert.setMessage(getText(R.string.dialog_delete_contact_confirmation_text));
+
 
         alert.setPositiveButton(getText(R.string.dialog_delete_positive_btn), new DialogInterface.OnClickListener() {
 
@@ -213,10 +213,39 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
             public void onClick(DialogInterface dialog, int which) {
 
                 // Deleting contact on long press
-                //chatDbHelper.deleteContact(contact.getsUserId());
+                new Thread(new Runnable() {
+                    public void run() {
 
-                // Updating list
-                updateContactList();
+                        try {
+                            String usernameForDelete = contactForDelete.getsUserName();
+
+                            final boolean response = httphelper.deleteUserFromServer(ContactsActivity.this, DELETE_CONTACT_URL+usernameForDelete);
+
+                            handler.post(new Runnable(){
+                                public void run() {
+                                    if (response) {
+                                        SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+                                        String deleteContactErr = prefs.getString("deleteContactErr", null);
+                                        Toast.makeText(ContactsActivity.this, deleteContactErr, Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+                                        String deleteContactErr = prefs.getString("deleteContactErr", null);
+                                        Toast.makeText(ContactsActivity.this, deleteContactErr, Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+
+                            // Updating list
+                            updateContactList();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+
+
 
             }
         });
@@ -231,7 +260,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
         });
 
         alert.show();
-*/
+
         return false;
     }
 

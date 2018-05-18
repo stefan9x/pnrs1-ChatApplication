@@ -309,6 +309,43 @@ public class HttpHelper {
         }
     }
 
+    /*HTTP delete*/
+    public boolean deleteUserFromServer(Context context, String urlString) throws IOException, JSONException {
+        HttpURLConnection urlConnection = null;
+        java.net.URL url = new URL(urlString);
+        urlConnection = (HttpURLConnection) url.openConnection();
+
+        SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+        String sessionId = prefs.getString("sessionId", null);
+
+
+        urlConnection.setRequestMethod("DELETE");
+        urlConnection.setRequestProperty("sessionid", sessionId);
+        urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+        urlConnection.setRequestProperty("Accept","application/json");
+
+        try {
+            urlConnection.connect();
+        } catch (IOException e) {
+            return false;
+        }
+
+        int responseCode =  urlConnection.getResponseCode();
+
+        SharedPreferences.Editor editor = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
+
+
+        String responseMsg = urlConnection.getResponseMessage();
+        String sendMsgErr = Integer.toString(responseCode) + " : " + responseMsg;
+        editor.putString("deleteContactErr", sendMsgErr);
+        editor.apply();
+
+
+        urlConnection.disconnect();
+
+        return (responseCode==SUCCESS);
+    }
+
     public boolean checkServer(String urlString) throws IOException {
 
         HttpURLConnection urlConnection;
