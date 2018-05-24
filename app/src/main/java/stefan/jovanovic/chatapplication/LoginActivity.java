@@ -25,6 +25,7 @@ import java.io.IOException;
 public class LoginActivity extends Activity implements View.OnClickListener {
 
     private EditText etUsername;
+
     private EditText etPassword;
     private Button btnLogin;
     private Button btnRegister;
@@ -172,8 +173,8 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                             jsonObject.put("username", etUsername.getText().toString());
                             jsonObject.put("password", etPassword.getText().toString());
 
-                            final boolean response = httphelper.logInUserOnServer(context, jsonObject);
-
+                            //final boolean response = httphelper.logInUserOnServer(context, jsonObject);
+                            final boolean response = true;
                             handler.post(new Runnable(){
                                 public void run() {
                                     if (response) {
@@ -181,6 +182,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                                         editor.putString("loggedinUsername", etUsername.getText().toString());
                                         editor.apply();
 
+                                        startService(new Intent(LoginActivity.this, NotificationService.class));
                                         startActivity(new Intent(LoginActivity.this, ContactsActivity.class));
                                     } else {
                                         SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
@@ -191,13 +193,20 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                             });
                         } catch (JSONException e) {
                             e.printStackTrace();
-                        } catch (IOException e) {
+                        } /*catch (IOException e) {
                             e.printStackTrace();
-                        }
+                        }*/
                     }
                 }).start();
                 break;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        stopService(new Intent(LoginActivity.this, NotificationService.class));
     }
 
     // Double press back button to exit app

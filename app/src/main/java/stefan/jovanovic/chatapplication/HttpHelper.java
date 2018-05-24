@@ -30,6 +30,7 @@ public class HttpHelper {
     private static String DELETE_CONTACT_URL = BASE_URL + "/contact/";
     private static String REGISTER_URL = BASE_URL + "/register";
     private static String DELETE_MESSAGE = BASE_URL + "/message";
+    private static String GET_NOTIFICATION_URL = BASE_URL + "/getfromservice";
 
     public boolean registerUserOnServer(Context context, JSONObject jsonObject) throws IOException{
 
@@ -402,6 +403,34 @@ public class HttpHelper {
 
         urlConnection.disconnect();
         return (responseCode==SUCCESS);
+    }
+
+    /*HTTP getNotification*/
+    public boolean getNotification(Context context) throws IOException, JSONException {
+        HttpURLConnection urlConnection = null;
+        java.net.URL url = new URL(GET_NOTIFICATION_URL);
+        urlConnection = (HttpURLConnection) url.openConnection();
+
+        SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+        String sessionId = prefs.getString("sessionId", null);
+
+
+        urlConnection.setRequestMethod("GET");
+        urlConnection.setRequestProperty("sessionid", sessionId);
+        urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+        urlConnection.setRequestProperty("Accept","application/json");
+/*
+        try {
+            urlConnection.connect();
+        } catch (IOException e) {
+            return false;
+        }
+*/
+        //int responseCode =  urlConnection.getResponseCode();
+
+        urlConnection.disconnect();
+        return true;
+        //return (responseCode==SUCCESS);
     }
 
     public boolean checkServer() throws IOException {
