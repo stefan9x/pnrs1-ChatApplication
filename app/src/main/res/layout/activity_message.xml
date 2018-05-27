@@ -54,7 +54,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/messages_list"
-        android:layout_weight="10"/>
+        android:layout_weight="10"
+        android:transcriptMode="alwaysScroll"
+        android:stackFromBottom="true"/>
 
 
     <RelativeLayout

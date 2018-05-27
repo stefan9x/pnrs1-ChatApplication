@@ -2,6 +2,7 @@ package stefan.jovanovic.chatapplication;
 
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
@@ -68,32 +69,36 @@ public class NotificationService extends Service {
                 return;
             }
 
-			try {
-				final boolean response = httphelper.getNotification(getApplicationContext());
+            final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext(), null)
+                    .setSmallIcon(R.drawable.ic_stat_icon)
+                    .setLargeIcon(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                            R.mipmap.ic_launcher))
+                    .setContentTitle(getText(R.string.app_name))
+                    .setContentText(getText(R.string.have_new_message))
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
-				handler.post(new Runnable(){
-					public void run() {
-						if (response) {
-							NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext(), null)
-									.setSmallIcon(R.drawable.app_icon)
-									.setContentTitle("Naslov notifikacije")
-									.setContentText("Imate novu poruku")
-									.setPriority(NotificationCompat.PRIORITY_DEFAULT);
+            final NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
 
-							NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        final boolean response = httphelper.getNotification(getApplicationContext());
 
-						// notificationId is a unique int for each notification that you must define
-							notificationManager.notify(2, mBuilder.build());
-						}
-					}
-				});
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-                
-           
+                        handler.post(new Runnable() {
+                            public void run() {
+                                if (response) {
+                                    // notificationId is a unique int for each notification that you must define
+                                    notificationManager.notify(2, mBuilder.build());
+                                }
+                            }
+                        });
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
 
             mHandler.postDelayed(this, PERIOD);
         }

@@ -90,6 +90,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
                             handler.post(new Runnable(){
                                 public void run() {
                                     if (success) {
+                                        stopService(new Intent(ContactsActivity.this, NotificationService.class));
                                         startActivity(new Intent(ContactsActivity.this, LoginActivity.class));
                                     } else {
                                         SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);

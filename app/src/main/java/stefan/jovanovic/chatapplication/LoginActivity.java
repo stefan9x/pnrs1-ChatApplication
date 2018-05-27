@@ -173,8 +173,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                             jsonObject.put("username", etUsername.getText().toString());
                             jsonObject.put("password", etPassword.getText().toString());
 
-                            //final boolean response = httphelper.logInUserOnServer(context, jsonObject);
-                            final boolean response = true;
+                            final boolean response = httphelper.logInUserOnServer(context, jsonObject);
                             handler.post(new Runnable(){
                                 public void run() {
                                     if (response) {
@@ -193,20 +192,13 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                             });
                         } catch (JSONException e) {
                             e.printStackTrace();
-                        } /*catch (IOException e) {
+                        } catch (IOException e) {
                             e.printStackTrace();
-                        }*/
+                        }
                     }
                 }).start();
                 break;
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        stopService(new Intent(LoginActivity.this, NotificationService.class));
     }
 
     // Double press back button to exit app

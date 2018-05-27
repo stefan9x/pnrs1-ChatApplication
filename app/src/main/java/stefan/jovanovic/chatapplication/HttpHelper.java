@@ -26,7 +26,7 @@ public class HttpHelper {
     private static String LOGIN_URL = BASE_URL + "/login";
     private static String LOGOUT_URL = BASE_URL + "/logout";
     private static String GET_MESSAGE_URL = BASE_URL + "/message/";
-    private static String POST_MESSAGE_URL = "/message";
+    private static String POST_MESSAGE_URL = BASE_URL + "/message";
     private static String DELETE_CONTACT_URL = BASE_URL + "/contact/";
     private static String REGISTER_URL = BASE_URL + "/register";
     private static String DELETE_MESSAGE = BASE_URL + "/message";
@@ -419,18 +419,30 @@ public class HttpHelper {
         urlConnection.setRequestProperty("sessionid", sessionId);
         urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
         urlConnection.setRequestProperty("Accept","application/json");
-/*
+
         try {
             urlConnection.connect();
         } catch (IOException e) {
             return false;
         }
-*/
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+
+        String line;
+        while ((line = br.readLine()) != null) {
+            sb.append(line);
+        }
+
+        br.close();
+
+        Boolean response = Boolean.valueOf(sb.toString());
+
+
         //int responseCode =  urlConnection.getResponseCode();
 
         urlConnection.disconnect();
-        return true;
-        //return (responseCode==SUCCESS);
+        return (response);
     }
 
     public boolean checkServer() throws IOException {
