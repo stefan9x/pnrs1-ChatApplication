@@ -438,9 +438,6 @@ public class HttpHelper {
 
         Boolean response = Boolean.valueOf(sb.toString());
 
-
-        //int responseCode =  urlConnection.getResponseCode();
-
         urlConnection.disconnect();
         return (response);
     }

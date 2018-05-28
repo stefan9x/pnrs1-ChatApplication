@@ -1,16 +1,24 @@
 package stefan.jovanovic.chatapplication;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
+import android.os.RemoteException;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -34,8 +42,6 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     private int backbtnCounter;
 
     public static final String MY_PREFS_NAME = "PrefsFile";
-
-    private Context context;
 
     private HttpHelper httphelper;
     private Handler handler;
@@ -105,8 +111,6 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         // Disables login button on activity create
         btnLogin.setEnabled(false);
 
-        context = this;
-
         // Initialization
         httphelper = new HttpHelper();
         handler = new Handler();
@@ -173,18 +177,17 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                             jsonObject.put("username", etUsername.getText().toString());
                             jsonObject.put("password", etPassword.getText().toString());
 
-                            final boolean response = httphelper.logInUserOnServer(context, jsonObject);
+                            final boolean response = httphelper.logInUserOnServer(LoginActivity.this, jsonObject);
                             handler.post(new Runnable(){
                                 public void run() {
                                     if (response) {
-                                        SharedPreferences.Editor editor = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
+                                        SharedPreferences.Editor editor = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
                                         editor.putString("loggedinUsername", etUsername.getText().toString());
                                         editor.apply();
 
-                                        startService(new Intent(LoginActivity.this, NotificationService.class));
                                         startActivity(new Intent(LoginActivity.this, ContactsActivity.class));
                                     } else {
-                                        SharedPreferences prefs = context.getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+                                        SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
                                         String loginErr = prefs.getString("loginErr", null);
                                         Toast.makeText(LoginActivity.this, loginErr, Toast.LENGTH_SHORT).show();
                                     }

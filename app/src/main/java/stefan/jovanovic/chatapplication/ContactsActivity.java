@@ -2,11 +2,19 @@ package stefan.jovanovic.chatapplication;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
+import android.os.RemoteException;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -20,7 +28,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
-public class ContactsActivity extends Activity implements View.OnClickListener, AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener {
+public class ContactsActivity extends Activity implements View.OnClickListener, AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener, ServiceConnection {
 
     private ListView lvContacts;
     private Button btnLogout;
@@ -34,6 +42,8 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
     private HttpHelper httphelper;
     private Handler handler;
+
+    private INotificationBinder mService = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +77,8 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
         handler = new Handler();
 
+        bindService(new Intent(ContactsActivity.this, NotificationService.class), this, Context.BIND_AUTO_CREATE);
+
     }
 
     @Override
@@ -75,6 +87,15 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
         // Updating list
         updateContactList();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (mService != null) {
+            unbindService(this);
+        }
     }
 
     @Override
@@ -90,7 +111,6 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
                             handler.post(new Runnable(){
                                 public void run() {
                                     if (success) {
-                                        stopService(new Intent(ContactsActivity.this, NotificationService.class));
                                         startActivity(new Intent(ContactsActivity.this, LoginActivity.class));
                                     } else {
                                         SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
@@ -254,6 +274,62 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
         alert.show();
 
         return false;
+    }
+
+    @Override
+    public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+        mService = INotificationBinder.Stub.asInterface(iBinder);
+        try {
+            mService.setCallback(new NotificationCallback());
+        } catch (RemoteException e) {
+        }
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName componentName) {
+        mService = null;
+    }
+
+    private class NotificationCallback extends INotificationCallback.Stub {
+
+        @Override
+        public void onCallbackCall() throws RemoteException {
+
+            final HttpHelper httpHelper = new HttpHelper();
+            final Handler handler = new Handler();
+
+            final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext(), null)
+                    .setSmallIcon(R.drawable.ic_stat_icon)
+                    .setLargeIcon(BitmapFactory.decodeResource(getApplicationContext().getResources(),
+                            R.mipmap.ic_launcher))
+                    .setContentTitle(getText(R.string.app_name))
+                    .setContentText(getText(R.string.have_new_message))
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+            final NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
+
+
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        final boolean response = httpHelper.getNotification(ContactsActivity.this);
+
+                        handler.post(new Runnable() {
+                            public void run() {
+                                if (response) {
+                                    // notificationId is a unique int for each notification that you must define
+                                    notificationManager.notify(2, mBuilder.build());
+                                }
+                            }
+                        });
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        }
     }
 
 }

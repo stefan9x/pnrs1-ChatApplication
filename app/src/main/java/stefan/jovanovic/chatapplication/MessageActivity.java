@@ -127,7 +127,6 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
                             handler.post(new Runnable(){
                                 public void run() {
                                     if (response) {
-                                        stopService(new Intent(MessageActivity.this, NotificationService.class));
                                         startActivity(new Intent(MessageActivity.this, LoginActivity.class));
                                     } else {
                                         SharedPreferences prefs = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
