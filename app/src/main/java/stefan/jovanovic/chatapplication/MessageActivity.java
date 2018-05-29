@@ -42,6 +42,8 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
     private HttpHelper httphelper;
     private Handler handler;
 
+    Crypto mCrypto;
+
     private TextWatcher twSend = new TextWatcher() {
 
         @Override
@@ -105,6 +107,8 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
 
         handler = new Handler();
 
+        mCrypto = new Crypto();
+
     }
 
     @Override
@@ -118,13 +122,13 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
     @Override
     public void onClick(View view) {
 
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.btn_logout_message:
                 new Thread(new Runnable() {
                     public void run() {
                         try {
                             final boolean response = httphelper.logOutUserFromServer(MessageActivity.this);
-                            handler.post(new Runnable(){
+                            handler.post(new Runnable() {
                                 public void run() {
                                     if (response) {
                                         startActivity(new Intent(MessageActivity.this, LoginActivity.class));
@@ -154,7 +158,9 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
                         JSONObject jsonObject = new JSONObject();
                         try {
                             jsonObject.put("receiver", receiverUsername);
-                            jsonObject.put("data", etMessage.getText().toString());
+                            String message = etMessage.getText().toString();
+                            String cryptedMsg = mCrypto.crypt(message);
+                            jsonObject.put("data", cryptedMsg);
 
                             final boolean success = httphelper.sendMessageToServer(MessageActivity.this, jsonObject);
 
@@ -178,8 +184,6 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
                         }
                     }
                 }).start();
-
-                break;
         }
     }
 
@@ -200,7 +204,9 @@ public class MessageActivity extends Activity implements View.OnClickListener, A
                                 for (int i = 0; i < messages.length(); i++) {
                                     try {
                                         json_message = messages.getJSONObject(i);
-                                        messageClass[i] = new MessageClass(json_message.getString("sender"),json_message.getString("data"));
+                                        String message = json_message.getString("data");
+                                        String decryptedMsg = mCrypto.crypt(message);
+                                        messageClass[i] = new MessageClass(json_message.getString("sender"), decryptedMsg);
                                     } catch (JSONException e1) {
                                         e1.printStackTrace();
                                     }
