@@ -45,6 +45,8 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
     private INotificationBinder mService = null;
 
+    private Crypto mCrypto;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +78,8 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
         httphelper = new HttpHelper();
 
         handler = new Handler();
-
+        mCrypto = new Crypto();
+        
         bindService(new Intent(ContactsActivity.this, NotificationService.class), this, Context.BIND_AUTO_CREATE);
 
     }
@@ -185,7 +188,10 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
                                     int lastMsgIndex = messages.length()-1;
                                     try {
                                         json_message = messages.getJSONObject(lastMsgIndex);
-                                        lastMsg = json_message.getString("sender") +": " + json_message.getString("data");
+
+                                        String message = json_message.getString("data");
+                                        String cryptedMsg = mCrypto.crypt(message);
+                                        lastMsg = json_message.getString("sender") +": " + cryptedMsg;
                                     } catch (JSONException e1) {
                                         e1.printStackTrace();
                                     }
