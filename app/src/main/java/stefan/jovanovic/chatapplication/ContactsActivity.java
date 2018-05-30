@@ -79,7 +79,7 @@ public class ContactsActivity extends Activity implements View.OnClickListener, 
 
         handler = new Handler();
         mCrypto = new Crypto();
-        
+
         bindService(new Intent(ContactsActivity.this, NotificationService.class), this, Context.BIND_AUTO_CREATE);
 
     }
